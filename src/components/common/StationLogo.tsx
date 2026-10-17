@@ -32,10 +32,17 @@ export const StationLogo: React.FC<StationLogoProps> = ({
         }
       }
     };
+    const handleStorage = (e: StorageEvent) => {
+      if (stationId && e.key === `stationhub_logo_${stationId}`) {
+        setLiveLogo(e.newValue || '');
+      }
+    };
     if (typeof window !== 'undefined') {
       window.addEventListener('stationhub_station_updated', handleStationUpdate);
+      window.addEventListener('storage', handleStorage);
       return () => {
         window.removeEventListener('stationhub_station_updated', handleStationUpdate);
+        window.removeEventListener('storage', handleStorage);
       };
     }
   }, [stationId]);

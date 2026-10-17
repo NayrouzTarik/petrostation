@@ -12,14 +12,13 @@ import {
   RotateCcw,
   Building,
   MapPin,
-  Phone,
-  FileBadge,
+  Check,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.tsx';
 import { StationLogo } from '../common/StationLogo.tsx';
 
 // Helper to compress uploaded logo down to a lightweight, high-res canvas dataURL (<25 KB)
-// This guarantees zero localStorage quota issues and instant real-time sync across devices.
+// Guarantees zero quota issues, instant local cache and immediate cloud synchronization.
 function compressImage(file: File, maxDim = 360, quality = 0.88): Promise<string> {
   return new Promise((resolve, reject) => {
     if (file.type === 'image/svg+xml') {
@@ -83,6 +82,22 @@ export const SettingsView: React.FC = () => {
   const [companyName, setCompanyName] = useState(station?.companyName || '');
   const [ice, setIce] = useState(station?.ice || '');
 
+  // 3. Station Logo State
+  const getInitialLogo = () => {
+    if (station?.logoUrl && !station.logoUrl.includes('station_modern_exterior')) {
+      return station.logoUrl;
+    }
+    if (station?.id && typeof window !== 'undefined') {
+      return localStorage.getItem(`stationhub_logo_${station.id}`) || '';
+    }
+    return '';
+  };
+
+  const [logoPreview, setLogoPreview] = useState<string>(getInitialLogo);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [savingLogo, setSavingLogo] = useState(false);
+  const [logoSavedSuccess, setLogoSavedSuccess] = useState<string | null>(null);
+
   // Update fields if station changes
   useEffect(() => {
     if (station) {
@@ -92,24 +107,12 @@ export const SettingsView: React.FC = () => {
       setStationPhone(station.phone || '');
       setCompanyName(station.companyName || '');
       setIce(station.ice || '');
-      if (station.logoUrl && !station.logoUrl.includes('station_modern_exterior')) {
-        setLogoPreview(station.logoUrl);
+      const existingLogo = getInitialLogo();
+      if (existingLogo) {
+        setLogoPreview(existingLogo);
       }
     }
   }, [station]);
-
-  // 3. Station Logo State
-  const [currentLogo, setCurrentLogo] = useState<string>(() => {
-    if (station?.logoUrl && !station.logoUrl.includes('station_modern_exterior')) {
-      return station.logoUrl;
-    }
-    if (station?.id && typeof window !== 'undefined') {
-      return localStorage.getItem(`stationhub_logo_${station.id}`) || '';
-    }
-    return '';
-  });
-  const [logoPreview, setLogoPreview] = useState<string>(currentLogo);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 4. Password State
   const [currentPassword, setCurrentPassword] = useState('');
@@ -124,7 +127,60 @@ export const SettingsView: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Handle Logo Upload with automatic lightweight compression
+  // SAVE LOGO IMMEDIATELY helper
+  const saveLogoDirectly = async (logoDataUrl: string) => {
+    try {
+      setSavingLogo(true);
+      setErrorMessage(null);
+
+      // Save in state & localStorage directly
+      setLogoPreview(logoDataUrl);
+      if (station?.id && typeof window !== 'undefined') {
+        try {
+          if (logoDataUrl) {
+            localStorage.setItem(`stationhub_logo_${station.id}`, logoDataUrl);
+          } else {
+            localStorage.removeItem(`stationhub_logo_${station.id}`);
+          }
+          localStorage.removeItem('stationhub_custom_doc_logo');
+        } catch (e) {
+          console.warn('localStorage error', e);
+        }
+      }
+
+      // Propagate through AuthContext and persistence engine
+      await updateGerantSettings({
+        logoUrl: logoDataUrl,
+      });
+
+      // Dispatch global event for instant re-render of Header and all views
+      if (typeof window !== 'undefined' && station) {
+        window.dispatchEvent(
+          new CustomEvent('stationhub_station_updated', {
+            detail: { ...station, logoUrl: logoDataUrl },
+          })
+        );
+      }
+
+      const msg = logoDataUrl
+        ? '✓ Nouveau logo officiel enregistré et appliqué immédiatement !'
+        : `✓ Logo rétabli à l'enseigne officielle (${station?.brand || 'par défaut'}).`;
+      setLogoSavedSuccess(msg);
+      setSuccessMessage(msg);
+      setTimeout(() => {
+        setLogoSavedSuccess(null);
+        setSuccessMessage(null);
+      }, 6000);
+    } catch (err: any) {
+      console.error('Erreur sauvegarde directe logo:', err);
+      setErrorMessage(err.message || 'Erreur lors de la sauvegarde du logo.');
+    } finally {
+      setSavingLogo(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  // Handle Logo Upload with automatic lightweight compression & IMMEDIATE SAVE
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -135,28 +191,26 @@ export const SettingsView: React.FC = () => {
     }
 
     try {
+      setSavingLogo(true);
       const compressed = await compressImage(file, 360, 0.88);
-      setLogoPreview(compressed);
-      setErrorMessage(null);
+      await saveLogoDirectly(compressed);
     } catch (err) {
       console.warn('Erreur compression image, lecture directe:', err);
       const reader = new FileReader();
-      reader.onload = () => {
-        setLogoPreview(reader.result as string);
-        setErrorMessage(null);
+      reader.onload = async () => {
+        const raw = reader.result as string;
+        await saveLogoDirectly(raw);
       };
       reader.readAsDataURL(file);
     }
   };
 
-  // Reset to Default Brand Logo
-  const handleResetToDefaultLogo = () => {
-    setLogoPreview('');
-    if (fileInputRef.current) fileInputRef.current.value = '';
-    setErrorMessage(null);
+  // Reset to Default Brand Logo with IMMEDIATE SAVE
+  const handleResetToDefaultLogo = async () => {
+    await saveLogoDirectly('');
   };
 
-  // Save Settings
+  // Save All Settings
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
@@ -202,12 +256,11 @@ export const SettingsView: React.FC = () => {
         newPassword: newPassword || undefined,
       });
 
-      setCurrentLogo(logoPreview);
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
 
-      setSuccessMessage('Vos paramètres (logo, informations de la station et profil) ont été mis à jour avec succès.');
+      setSuccessMessage('Vos paramètres (logo, informations de station et profil) ont été enregistrés avec succès.');
       setTimeout(() => setSuccessMessage(null), 6000);
     } catch (err: any) {
       setErrorMessage(err.message || 'Une erreur est survenue lors de la mise à jour.');
@@ -267,9 +320,16 @@ export const SettingsView: React.FC = () => {
             )}
           </div>
 
+          {logoSavedSuccess && (
+            <div className="p-3 bg-emerald-50 dark:bg-emerald-950/70 border border-emerald-200 dark:border-emerald-800 rounded-xl text-xs text-emerald-800 dark:text-emerald-200 flex items-center gap-2 animate-in fade-in duration-200">
+              <Check className="w-4 h-4 shrink-0 text-emerald-600" />
+              <span className="font-semibold">{logoSavedSuccess}</span>
+            </div>
+          )}
+
           <div className="flex flex-col sm:flex-row items-center gap-6">
             {/* Live Logo Preview Box */}
-            <div className="w-28 h-28 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 flex flex-col items-center justify-center p-3 relative group shrink-0">
+            <div className="w-28 h-28 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 flex flex-col items-center justify-center p-3 relative group shrink-0 shadow-inner">
               <StationLogo
                 stationId={station?.id}
                 brand={station?.brand}
@@ -287,7 +347,7 @@ export const SettingsView: React.FC = () => {
                   Aperçu du logo actuel (Enseigne : {station?.brand || 'Marque'})
                 </span>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-                  Ce logo s'applique immédiatement dans <strong>la barre supérieure permanente</strong> et sur <strong>toutes vos fiches et documents imprimables</strong> (Rapports de clôture journalière, Factures clients, Bons de Livraison, Devis et Achats).
+                  Dès que vous sélectionnez une image, elle est <strong>enregistrée automatiquement et appliquée instantanément</strong> dans la barre supérieure permanente et sur tous vos documents imprimables (Rapports de clôture, Factures, BL, Devis et Achats).
                 </p>
               </div>
 
@@ -302,16 +362,34 @@ export const SettingsView: React.FC = () => {
 
                 <button
                   type="button"
+                  disabled={savingLogo}
                   onClick={() => fileInputRef.current?.click()}
-                  className="px-4 py-2 text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-800 rounded-xl transition-colors flex items-center gap-2 shadow-xs cursor-pointer"
+                  className="px-4 py-2 text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 rounded-xl transition-colors flex items-center gap-2 shadow-xs cursor-pointer"
                 >
-                  <Upload className="w-3.5 h-3.5" />
-                  <span>Téléverser un logo</span>
+                  {savingLogo ? (
+                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Upload className="w-3.5 h-3.5" />
+                  )}
+                  <span>{savingLogo ? 'Enregistrement...' : 'Téléverser un logo'}</span>
                 </button>
 
                 {logoPreview && (
                   <button
                     type="button"
+                    disabled={savingLogo}
+                    onClick={() => saveLogoDirectly(logoPreview)}
+                    className="px-3.5 py-2 text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/70 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 border border-emerald-200 dark:border-emerald-800 rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Check className="w-3.5 h-3.5" />
+                    <span>Sauvegarder ce logo</span>
+                  </button>
+                )}
+
+                {logoPreview && (
+                  <button
+                    type="button"
+                    disabled={savingLogo}
                     onClick={handleResetToDefaultLogo}
                     className="px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer"
                     title={`Rétablir le logo officiel de la marque (${station?.brand || 'par défaut'})`}
@@ -529,7 +607,7 @@ export const SettingsView: React.FC = () => {
             ) : (
               <Save className="w-4 h-4" />
             )}
-            <span>{saving ? 'Enregistrement en cours...' : 'Enregistrer les modifications'}</span>
+            <span>{saving ? 'Enregistrement en cours...' : 'Enregistrer toutes les modifications'}</span>
           </button>
         </div>
       </form>
