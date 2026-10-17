@@ -16,7 +16,17 @@ interface AuthContextType {
   refreshStationsList: () => Promise<void>;
   updateGerantSettings: (data: {
     name?: string;
+    stationName?: string;
+    brand?: string;
+    city?: string;
+    location?: string;
+    phone?: string;
+    companyName?: string;
+    ice?: string;
+    rc?: string;
+    patente?: string;
     logoUrl?: string;
+    stationId?: string;
     currentPassword?: string;
     newPassword?: string;
   }) => Promise<void>;
@@ -150,31 +160,84 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateGerantSettings = async (data: {
     name?: string;
+    stationName?: string;
+    brand?: string;
+    city?: string;
+    location?: string;
+    phone?: string;
+    companyName?: string;
+    ice?: string;
+    rc?: string;
+    patente?: string;
     logoUrl?: string;
+    stationId?: string;
     currentPassword?: string;
     newPassword?: string;
   }) => {
     if (!user) throw new Error('Utilisateur non connecté');
-    const res = await api.updateGerantProfile(user.id, data);
+    const targetStationId = data.stationId || station?.id || user.stationId;
+    const res = await api.updateGerantProfile(user.id, {
+      ...data,
+      stationId: targetStationId,
+    });
+
     if (res.user) {
       setUser((prev) => (prev ? { ...prev, name: res.user.name } : null));
-      const saved = localStorage.getItem('stationhub_user');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        parsed.name = res.user.name;
-        localStorage.setItem('stationhub_user', JSON.stringify(parsed));
+      try {
+        const saved = localStorage.getItem('stationhub_user');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          parsed.name = res.user.name;
+          localStorage.setItem('stationhub_user', JSON.stringify(parsed));
+        }
+      } catch (e) {
+        console.warn('localStorage user save handled safely', e);
       }
     }
-    if (data.logoUrl !== undefined) {
-      if (station?.id) {
-        if (data.logoUrl) {
-          localStorage.setItem(`stationhub_logo_${station.id}`, data.logoUrl);
-        } else {
-          localStorage.removeItem(`stationhub_logo_${station.id}`);
+
+    const updatedStation =
+      res.station ||
+      (station
+        ? {
+            ...station,
+            name: data.stationName || station.name,
+            location: data.location !== undefined ? data.location : station.location,
+            city: data.city || station.city,
+            phone: data.phone !== undefined ? data.phone : station.phone,
+            companyName: data.companyName !== undefined ? data.companyName : station.companyName,
+            ice: data.ice !== undefined ? data.ice : station.ice,
+            rc: data.rc !== undefined ? data.rc : station.rc,
+            patente: data.patente !== undefined ? data.patente : station.patente,
+            brand: data.brand || station.brand,
+            logoUrl: data.logoUrl !== undefined ? data.logoUrl : station.logoUrl,
+          }
+        : null);
+
+    if (updatedStation) {
+      setStation(updatedStation);
+      setAllStations((prev) =>
+        prev.map((s) => (s.id === updatedStation.id ? updatedStation : s))
+      );
+
+      try {
+        localStorage.setItem('stationhub_station', JSON.stringify(updatedStation));
+        if (updatedStation.id && data.logoUrl !== undefined) {
+          if (data.logoUrl) {
+            localStorage.setItem(`stationhub_logo_${updatedStation.id}`, data.logoUrl);
+          } else {
+            localStorage.removeItem(`stationhub_logo_${updatedStation.id}`);
+          }
         }
+        localStorage.removeItem('stationhub_custom_doc_logo');
+      } catch (e) {
+        console.warn('localStorage logo quota handled safely', e);
       }
-      localStorage.removeItem('stationhub_custom_doc_logo');
-      setStation((prev) => (prev ? { ...prev, logoUrl: data.logoUrl || '' } : null));
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(
+          new CustomEvent('stationhub_station_updated', { detail: updatedStation })
+        );
+      }
     }
   };
 

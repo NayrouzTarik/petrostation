@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface StationLogoProps {
   stationId?: string;
@@ -17,6 +17,29 @@ export const StationLogo: React.FC<StationLogoProps> = ({
   className = '',
   size = 'md',
 }) => {
+  const [liveLogo, setLiveLogo] = useState<string | undefined>(logoUrl);
+
+  useEffect(() => {
+    setLiveLogo(logoUrl);
+  }, [logoUrl]);
+
+  useEffect(() => {
+    const handleStationUpdate = (e: any) => {
+      const updated = e.detail;
+      if (updated && (!stationId || updated.id === stationId)) {
+        if (updated.logoUrl !== undefined) {
+          setLiveLogo(updated.logoUrl);
+        }
+      }
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('stationhub_station_updated', handleStationUpdate);
+      return () => {
+        window.removeEventListener('stationhub_station_updated', handleStationUpdate);
+      };
+    }
+  }, [stationId]);
+
   const sizeClasses = {
     sm: 'w-7 h-7 text-xs',
     md: 'w-9 h-9 text-sm',
@@ -24,19 +47,28 @@ export const StationLogo: React.FC<StationLogoProps> = ({
     xl: 'w-16 h-16 text-lg',
   }[size];
 
-  // 1. Resolve custom logo specifically for THIS station (prevent leakage across clients)
+  // 1. Resolve custom logo specifically for THIS station
+  const currentLogoCandidate = liveLogo !== undefined ? liveLogo : logoUrl;
+  const isResetToDefault = currentLogoCandidate === '';
+
   const scopedLocalLogo =
-    typeof window !== 'undefined' && stationId
+    typeof window !== 'undefined' && stationId && !isResetToDefault
       ? localStorage.getItem(`stationhub_logo_${stationId}`)
       : null;
 
   const isCustomLogoUrl =
-    logoUrl &&
-    (logoUrl.startsWith('data:image') ||
-      logoUrl.startsWith('blob:') ||
-      (!logoUrl.includes('station_modern_exterior') && logoUrl.trim() !== ''));
+    Boolean(currentLogoCandidate) &&
+    !isResetToDefault &&
+    (currentLogoCandidate!.startsWith('data:image') ||
+      currentLogoCandidate!.startsWith('blob:') ||
+      currentLogoCandidate!.startsWith('http') ||
+      (!currentLogoCandidate!.includes('station_modern_exterior') && currentLogoCandidate!.trim() !== ''));
 
-  const effectiveCustomLogo = isCustomLogoUrl ? logoUrl : scopedLocalLogo;
+  const effectiveCustomLogo = isResetToDefault
+    ? null
+    : isCustomLogoUrl
+    ? currentLogoCandidate
+    : scopedLocalLogo;
 
   if (effectiveCustomLogo) {
     return (

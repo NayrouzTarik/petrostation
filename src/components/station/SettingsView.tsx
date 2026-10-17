@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   User as UserIcon,
   Image,
@@ -10,11 +10,64 @@ import {
   Eye,
   EyeOff,
   RotateCcw,
-  Sparkles,
-  ShieldCheck,
+  Building,
+  MapPin,
+  Phone,
+  FileBadge,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.tsx';
 import { StationLogo } from '../common/StationLogo.tsx';
+
+// Helper to compress uploaded logo down to a lightweight, high-res canvas dataURL (<25 KB)
+// This guarantees zero localStorage quota issues and instant real-time sync across devices.
+function compressImage(file: File, maxDim = 360, quality = 0.88): Promise<string> {
+  return new Promise((resolve, reject) => {
+    if (file.type === 'image/svg+xml') {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new window.Image();
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+        if (width > height) {
+          if (width > maxDim) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          }
+        } else {
+          if (height > maxDim) {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          resolve(e.target?.result as string);
+          return;
+        }
+        ctx.drawImage(img, 0, 0, width, height);
+        const outputType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+        const compressedBase64 = canvas.toDataURL(outputType, quality);
+        resolve(compressedBase64);
+      };
+      img.onerror = () => resolve(e.target?.result as string);
+      img.src = e.target?.result as string;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
 export const SettingsView: React.FC = () => {
   const { user, station, updateGerantSettings } = useAuth();
@@ -22,7 +75,30 @@ export const SettingsView: React.FC = () => {
   // 1. Manager Name State
   const [managerName, setManagerName] = useState(user?.name || '');
 
-  // 2. Station Logo State (scoped to this station and client)
+  // 2. Station Information States
+  const [stationName, setStationName] = useState(station?.name || '');
+  const [city, setCity] = useState(station?.city || '');
+  const [location, setLocation] = useState(station?.location || '');
+  const [stationPhone, setStationPhone] = useState(station?.phone || '');
+  const [companyName, setCompanyName] = useState(station?.companyName || '');
+  const [ice, setIce] = useState(station?.ice || '');
+
+  // Update fields if station changes
+  useEffect(() => {
+    if (station) {
+      setStationName(station.name || '');
+      setCity(station.city || '');
+      setLocation(station.location || '');
+      setStationPhone(station.phone || '');
+      setCompanyName(station.companyName || '');
+      setIce(station.ice || '');
+      if (station.logoUrl && !station.logoUrl.includes('station_modern_exterior')) {
+        setLogoPreview(station.logoUrl);
+      }
+    }
+  }, [station]);
+
+  // 3. Station Logo State
   const [currentLogo, setCurrentLogo] = useState<string>(() => {
     if (station?.logoUrl && !station.logoUrl.includes('station_modern_exterior')) {
       return station.logoUrl;
@@ -35,7 +111,7 @@ export const SettingsView: React.FC = () => {
   const [logoPreview, setLogoPreview] = useState<string>(currentLogo);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // 3. Password State
+  // 4. Password State
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -48,26 +124,32 @@ export const SettingsView: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Handle Logo Upload from Local Computer
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Handle Logo Upload with automatic lightweight compression
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      setErrorMessage('Le fichier image ne doit pas dépasser 5 Mo');
+    if (file.size > 10 * 1024 * 1024) {
+      setErrorMessage('Le fichier image ne doit pas dépasser 10 Mo');
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result as string;
-      setLogoPreview(result);
+    try {
+      const compressed = await compressImage(file, 360, 0.88);
+      setLogoPreview(compressed);
       setErrorMessage(null);
-    };
-    reader.readAsDataURL(file);
+    } catch (err) {
+      console.warn('Erreur compression image, lecture directe:', err);
+      const reader = new FileReader();
+      reader.onload = () => {
+        setLogoPreview(reader.result as string);
+        setErrorMessage(null);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
-  // Reset to Default Brand Logo (Shell)
+  // Reset to Default Brand Logo
   const handleResetToDefaultLogo = () => {
     setLogoPreview('');
     if (fileInputRef.current) fileInputRef.current.value = '';
@@ -83,6 +165,10 @@ export const SettingsView: React.FC = () => {
     // Validation
     if (!managerName.trim()) {
       setErrorMessage('Le nom du gérant est obligatoire.');
+      return;
+    }
+    if (!stationName.trim()) {
+      setErrorMessage('Le nom de la station est obligatoire.');
       return;
     }
 
@@ -105,6 +191,12 @@ export const SettingsView: React.FC = () => {
       setSaving(true);
       await updateGerantSettings({
         name: managerName.trim(),
+        stationName: stationName.trim(),
+        city: city.trim(),
+        location: location.trim(),
+        phone: stationPhone.trim(),
+        companyName: companyName.trim(),
+        ice: ice.trim(),
         logoUrl: logoPreview,
         currentPassword: currentPassword || undefined,
         newPassword: newPassword || undefined,
@@ -115,8 +207,8 @@ export const SettingsView: React.FC = () => {
       setNewPassword('');
       setConfirmPassword('');
 
-      setSuccessMessage('Vos paramètres (nom, logo et mot de passe) ont été mis à jour avec succès.');
-      setTimeout(() => setSuccessMessage(null), 5000);
+      setSuccessMessage('Vos paramètres (logo, informations de la station et profil) ont été mis à jour avec succès.');
+      setTimeout(() => setSuccessMessage(null), 6000);
     } catch (err: any) {
       setErrorMessage(err.message || 'Une erreur est survenue lors de la mise à jour.');
     } finally {
@@ -130,14 +222,14 @@ export const SettingsView: React.FC = () => {
       <div className="border-b border-slate-200 dark:border-slate-800 pb-5">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center font-bold">
-            <UserIcon className="w-5 h-5" />
+            <Building className="w-5 h-5" />
           </div>
           <div>
             <h1 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
-              Paramètres du Profil Gérant
+              Paramètres de la Station & du Profil
             </h1>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Gérez votre identité, le logo officiel de votre station et la sécurité de votre compte.
+              Gérez votre logo officiel, le nom et l'adresse de votre station ainsi que votre profil gérant.
             </p>
           </div>
         </div>
@@ -145,58 +237,31 @@ export const SettingsView: React.FC = () => {
 
       {/* Notifications */}
       {successMessage && (
-        <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-xs flex items-center gap-3">
+        <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-xs flex items-center gap-3 shadow-xs">
           <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-600" />
           <span className="font-semibold">{successMessage}</span>
         </div>
       )}
 
       {errorMessage && (
-        <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs flex items-center gap-3">
+        <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs flex items-center gap-3 shadow-xs">
           <AlertCircle className="w-5 h-5 shrink-0 text-rose-600" />
           <span className="font-semibold">{errorMessage}</span>
         </div>
       )}
 
       <form onSubmit={handleSave} className="space-y-8">
-        {/* SECTION 1: NOM DU GÉRANT */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-2xs space-y-4">
-          <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100 dark:border-slate-800">
-            <UserIcon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            <h2 className="text-sm font-bold text-slate-900 dark:text-white">
-              1. Nom du Gérant
-            </h2>
-          </div>
-
-          <div className="space-y-2">
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
-              Nom et Prénom du Gérant / Responsable
-            </label>
-            <input
-              type="text"
-              value={managerName}
-              onChange={(e) => setManagerName(e.target.value)}
-              placeholder="Ex: Nayrouz Tarik"
-              required
-              className="w-full px-4 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 font-semibold"
-            />
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">
-              Ce nom apparaît dans la barre supérieure de StationHub, dans l'en-tête de session et comme signataire officiel sur les rapports de clôture, factures, BL et devis.
-            </p>
-          </div>
-        </div>
-
-        {/* SECTION 2: LOGO DE LA STATION */}
+        {/* SECTION 1: LOGO DE LA STATION */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-2xs space-y-5">
           <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center gap-2.5">
               <Image className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               <h2 className="text-sm font-bold text-slate-900 dark:text-white">
-                2. Logo de la Station
+                1. Logo Officiel de la Station
               </h2>
             </div>
             {logoPreview && (
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+              <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                 Logo Personnalisé Actif
               </span>
             )}
@@ -208,7 +273,7 @@ export const SettingsView: React.FC = () => {
               <StationLogo
                 stationId={station?.id}
                 brand={station?.brand}
-                name={station?.name}
+                name={stationName || station?.name}
                 logoUrl={logoPreview}
                 size="xl"
                 className="scale-125"
@@ -222,7 +287,7 @@ export const SettingsView: React.FC = () => {
                   Aperçu du logo actuel (Enseigne : {station?.brand || 'Marque'})
                 </span>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-                  Ce logo est spécifique à votre station. Il s'applique automatiquement sur l'en-tête de votre session et sur <strong>tous vos PDF imprimables</strong> (Rapports de clôture journalière, Factures clients, Bons de Livraison, Devis, et Factures Fournisseurs).
+                  Ce logo s'applique immédiatement dans <strong>la barre supérieure permanente</strong> et sur <strong>toutes vos fiches et documents imprimables</strong> (Rapports de clôture journalière, Factures clients, Bons de Livraison, Devis et Achats).
                 </p>
               </div>
 
@@ -252,7 +317,7 @@ export const SettingsView: React.FC = () => {
                     title={`Rétablir le logo officiel de la marque (${station?.brand || 'par défaut'})`}
                   >
                     <RotateCcw className="w-3.5 h-3.5 text-slate-500" />
-                    <span>Rétablir logo {station?.brand || 'de la marque'} par défaut</span>
+                    <span>Rétablir logo {station?.brand || 'de la marque'}</span>
                   </button>
                 )}
               </div>
@@ -260,13 +325,121 @@ export const SettingsView: React.FC = () => {
           </div>
         </div>
 
-        {/* SECTION 3: MOT DE PASSE */}
+        {/* SECTION 2: INFORMATIONS DE LA STATION (Nom, Emplacement, Ville) */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-2xs space-y-4">
+          <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100 dark:border-slate-800">
+            <MapPin className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <h2 className="text-sm font-bold text-slate-900 dark:text-white">
+              2. Informations de la Station (Barre supérieure & Documents)
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Nom de la Station
+              </label>
+              <input
+                type="text"
+                value={stationName}
+                onChange={(e) => setStationName(e.target.value)}
+                placeholder="Ex: Station Shell Hay Salam"
+                required
+                className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 font-semibold"
+              />
+              <p className="text-[10px] text-slate-400">Affiché en gras dans la barre supérieure et sur les fiches.</p>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Ville
+              </label>
+              <input
+                type="text"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                placeholder="Ex: Salé"
+                className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 font-semibold"
+              />
+              <p className="text-[10px] text-slate-400">Affiché à côté du nom dans la barre supérieure.</p>
+            </div>
+
+            <div className="space-y-1.5 sm:col-span-2">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Adresse / Emplacement complet
+              </label>
+              <input
+                type="text"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="Ex: HAY SALAM AVENUE ASSAHARA SECT 8 N1037"
+                className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 font-medium"
+              />
+              <p className="text-[10px] text-slate-400">Affiché sous le nom dans la barre supérieure et dans l'en-tête de vos factures et fiches.</p>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Raison Sociale (SARL / Entreprise)
+              </label>
+              <input
+                type="text"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                placeholder="Ex: STE PETROLEUM SERVICE SARL"
+                className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 font-medium"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                Téléphone de la Station
+              </label>
+              <input
+                type="text"
+                value={stationPhone}
+                onChange={(e) => setStationPhone(e.target.value)}
+                placeholder="Ex: +212 537-889900"
+                className="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 font-medium"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* SECTION 3: NOM DU GÉRANT */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-2xs space-y-4">
+          <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100 dark:border-slate-800">
+            <UserIcon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <h2 className="text-sm font-bold text-slate-900 dark:text-white">
+              3. Identité du Gérant
+            </h2>
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+              Nom et Prénom du Gérant / Responsable
+            </label>
+            <input
+              type="text"
+              value={managerName}
+              onChange={(e) => setManagerName(e.target.value)}
+              placeholder="Ex: Nayrouz Tarik"
+              required
+              className="w-full px-4 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 font-semibold"
+            />
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+              Ce nom apparaît comme signataire officiel sur les rapports de clôture, factures, BL et devis.
+            </p>
+          </div>
+        </div>
+
+        {/* SECTION 4: MOT DE PASSE */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-2xs space-y-5">
           <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100 dark:border-slate-800">
             <Lock className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             <div>
               <h2 className="text-sm font-bold text-slate-900 dark:text-white">
-                3. Sécurité & Mot de Passe
+                4. Sécurité & Mot de Passe
               </h2>
             </div>
           </div>
@@ -276,7 +449,6 @@ export const SettingsView: React.FC = () => {
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Mot de passe actuel */}
             <div className="space-y-1.5">
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Mot de passe actuel
@@ -299,7 +471,6 @@ export const SettingsView: React.FC = () => {
               </div>
             </div>
 
-            {/* Nouveau mot de passe */}
             <div className="space-y-1.5">
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Nouveau mot de passe
@@ -322,7 +493,6 @@ export const SettingsView: React.FC = () => {
               </div>
             </div>
 
-            {/* Confirmer le nouveau mot de passe */}
             <div className="space-y-1.5">
               <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Confirmer nouveau mot de passe

@@ -48,6 +48,18 @@ export const FacturationView: React.FC = () => {
   const [tempLogoUrl, setTempLogoUrl] = useState('');
   const logoFileInputRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    const handleStationUpdate = () => {
+      setCustomDocLogo(localStorage.getItem('stationhub_custom_doc_logo') || '');
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('stationhub_station_updated', handleStationUpdate);
+      return () => {
+        window.removeEventListener('stationhub_station_updated', handleStationUpdate);
+      };
+    }
+  }, []);
+
   // Modals state
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [viewingDoc, setViewingDoc] = useState<CommercialDoc | null>(null);

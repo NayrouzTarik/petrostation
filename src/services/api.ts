@@ -160,7 +160,22 @@ export const api = {
 
   async updateGerantProfile(
     id: string,
-    data: { name?: string; currentPassword?: string; newPassword?: string; logoUrl?: string }
+    data: {
+      name?: string;
+      stationName?: string;
+      brand?: string;
+      city?: string;
+      location?: string;
+      phone?: string;
+      companyName?: string;
+      ice?: string;
+      rc?: string;
+      patente?: string;
+      logoUrl?: string;
+      stationId?: string;
+      currentPassword?: string;
+      newPassword?: string;
+    }
   ): Promise<{ success: boolean; user: User; station?: Station; message: string }> {
     if (isStaticOrNoBackend()) return clientDb.updateGerantProfile(id, data);
     try {

@@ -344,7 +344,22 @@ export const clientDb = {
 
   async updateGerantProfile(
     id: string,
-    data: { name?: string; currentPassword?: string; newPassword?: string; logoUrl?: string }
+    data: {
+      name?: string;
+      stationName?: string;
+      brand?: string;
+      city?: string;
+      location?: string;
+      phone?: string;
+      companyName?: string;
+      ice?: string;
+      rc?: string;
+      patente?: string;
+      logoUrl?: string;
+      stationId?: string;
+      currentPassword?: string;
+      newPassword?: string;
+    }
   ) {
     const user = memoryDb.users.find((u) => u.id === id);
     if (!user) throw new Error('Utilisateur non trouvé');
@@ -367,14 +382,50 @@ export const clientDb = {
     }
 
     let station: Station | undefined;
-    if (user.stationId) {
-      station = memoryDb.stations.find((s) => s.id === user.stationId);
-      if (station && data.logoUrl !== undefined) {
-        station.logoUrl = data.logoUrl;
+    const targetStationId =
+      data.stationId ||
+      user.stationId ||
+      (memoryDb.stations.length > 0 ? memoryDb.stations[0].id : undefined);
+
+    if (targetStationId) {
+      station = memoryDb.stations.find((s) => s.id === targetStationId);
+      if (station) {
+        if (data.stationName !== undefined && data.stationName.trim()) {
+          station.name = data.stationName.trim();
+        }
+        if (data.city !== undefined && data.city.trim()) {
+          station.city = data.city.trim();
+        }
+        if (data.location !== undefined) {
+          station.location = data.location.trim();
+        }
+        if (data.phone !== undefined) {
+          station.phone = data.phone.trim();
+        }
+        if (data.companyName !== undefined) {
+          station.companyName = data.companyName.trim();
+        }
+        if (data.ice !== undefined) {
+          station.ice = data.ice.trim();
+        }
+        if (data.rc !== undefined) {
+          station.rc = data.rc.trim();
+        }
+        if (data.patente !== undefined) {
+          station.patente = data.patente.trim();
+        }
+        if (data.brand !== undefined && data.brand.trim()) {
+          station.brand = data.brand.trim();
+        }
+        if (data.logoUrl !== undefined) {
+          station.logoUrl = data.logoUrl;
+        }
       }
     }
 
-    persist();
+    persist('stations');
+    persist('users');
+
     return {
       success: true,
       user,
