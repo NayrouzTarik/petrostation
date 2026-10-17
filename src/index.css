@@ -1,0 +1,365 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --bg-main: #f8fafc;
+    --bg-card: #ffffff;
+    --text-main: #0f172a;
+    --border-main: #e2e8f0;
+  }
+
+  .dark {
+    --bg-main: #0a0f1d;
+    --bg-card: #111827;
+    --text-main: #f8fafc;
+    --border-main: #1f293d;
+    color-scheme: dark;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  
+  .font-mono, [data-mono="true"], .tabular-nums {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Smooth transition between themes */
+html {
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* =========================================================================
+   COMPREHENSIVE DARK MODE DESIGN SYSTEM
+   Prevents any "white cards on dark" and ensures consistent premium UI/UX
+   ========================================================================= */
+
+.dark {
+  background-color: #0a0f1d;
+  color: #f8fafc;
+}
+
+/* Card & Surface Overrides in Dark Mode */
+.dark .bg-white:not(:where([id*="printable"], [id*="printable"] *, .force-light, .force-light *)) {
+  background-color: #111827 !important;
+  color: #f8fafc;
+}
+
+.dark .bg-slate-50:not(:where([id*="printable"], [id*="printable"] *, .force-light, .force-light *)),
+.dark .bg-slate-50\/80:not(:where([id*="printable"], [id*="printable"] *, .force-light, .force-light *)),
+.dark .bg-slate-50\/60:not(:where([id*="printable"], [id*="printable"] *, .force-light, .force-light *)),
+.dark .bg-slate-50\/50:not(:where([id*="printable"], [id*="printable"] *, .force-light, .force-light *)) {
+  background-color: #182234 !important;
+  color: #f1f5f9;
+}
+
+.dark .bg-slate-100:not(:where([id*="printable"], [id*="printable"] *, .force-light, .force-light *)) {
+  background-color: #1f293d !important;
+  color: #e2e8f0;
+}
+
+.dark .bg-slate-200:not(:where([id*="printable"], [id*="printable"] *, .force-light, .force-light *)) {
+  background-color: #27354f !important;
+  color: #cbd5e1;
+}
+
+/* Borders in Dark Mode */
+.dark .border-slate-100:not(:where([id*="printable"], [id*="printable"] *, .force-light, .force-light *)),
+.dark .border-slate-200:not(:where([id*="printable"], [id*="printable"] *, .force-light, .force-light *)),
+.dark .border-slate-300:not(:where([id*="printable"], [id*="printable"] *, .force-light, .force-light *)) {
+  border-color: #243048 !important;
+}
+
+.dark .divide-slate-100:not(:where([id*="printable"], [id*="printable"] *, .force-light, .force-light *)) > :not([hidden]) ~ :not([hidden]),
+.dark .divide-slate-200:not(:where([id*="printable"], [id*="printable"] *, .force-light, .force-light *)) > :not([hidden]) ~ :not([hidden]) {
+  border-color: #243048 !important;
+}
+
+/* Text Overrides in Dark Mode */
+.dark .text-slate-900:not(:where([id*="printable"], [id*="printable"] *, .force-light, .force-light *)) {
+  color: #f8fafc !important;
+}
+
+.dark .text-slate-800:not(:where([id*="printable"], [id*="printable"] *, .force-light, .force-light *)) {
+  color: #f1f5f9 !important;
+}
+
+.dark .text-slate-700:not(:where([id*="printable"], [id*="printable"] *, .force-light, .force-light *)) {
+  color: #e2e8f0 !important;
+}
+
+.dark .text-slate-600:not(:where([id*="printable"], [id*="printable"] *, .force-light, .force-light *)),
+.dark .text-slate-500:not(:where([id*="printable"], [id*="printable"] *, .force-light, .force-light *)) {
+  color: #94a3b8 !important;
+}
+
+.dark .text-slate-400:not(:where([id*="printable"], [id*="printable"] *, .force-light, .force-light *)) {
+  color: #64748b !important;
+}
+
+/* ALL PRINTABLE DOCUMENTS & FICHES REMAIN IN CRISP WHITE THEME EVEN IN DARK MODE */
+[id*="printable"],
+[id*="printable"] *,
+.force-light,
+.force-light * {
+  color-scheme: light !important;
+}
+
+.dark [id*="printable"],
+.dark .force-light {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+.dark [id*="printable"] .bg-white,
+.dark .force-light .bg-white {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+.dark [id*="printable"] .bg-slate-50,
+.dark .force-light .bg-slate-50 {
+  background-color: #f8fafc !important;
+  color: #334155 !important;
+}
+
+.dark [id*="printable"] .bg-slate-100,
+.dark .force-light .bg-slate-100 {
+  background-color: #f1f5f9 !important;
+  color: #334155 !important;
+}
+
+.dark [id*="printable"] .bg-slate-200,
+.dark .force-light .bg-slate-200 {
+  background-color: #e2e8f0 !important;
+  color: #1e293b !important;
+}
+
+.dark [id*="printable"] .text-slate-900,
+.dark .force-light .text-slate-900 {
+  color: #0f172a !important;
+}
+
+.dark [id*="printable"] .text-slate-800,
+.dark .force-light .text-slate-800 {
+  color: #1e293b !important;
+}
+
+.dark [id*="printable"] .text-slate-700,
+.dark .force-light .text-slate-700 {
+  color: #334155 !important;
+}
+
+.dark [id*="printable"] .text-slate-600,
+.dark .force-light .text-slate-600 {
+  color: #475569 !important;
+}
+
+.dark [id*="printable"] .text-slate-500,
+.dark .force-light .text-slate-500 {
+  color: #64748b !important;
+}
+
+.dark [id*="printable"] .text-slate-400,
+.dark .force-light .text-slate-400 {
+  color: #94a3b8 !important;
+}
+
+.dark [id*="printable"] .border-slate-100,
+.dark .force-light .border-slate-100 {
+  border-color: #f1f5f9 !important;
+}
+
+.dark [id*="printable"] .border-slate-200,
+.dark .force-light .border-slate-200 {
+  border-color: #e2e8f0 !important;
+}
+
+.dark [id*="printable"] .border-slate-300,
+.dark .force-light .border-slate-300 {
+  border-color: #cbd5e1 !important;
+}
+
+/* Form Inputs, Selects, and Textareas in Dark Mode */
+.dark input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([id*="printable"]):not(.force-light),
+.dark select:not([id*="printable"]):not(.force-light),
+.dark textarea:not([id*="printable"]):not(.force-light) {
+  background-color: #182234 !important;
+  color: #f8fafc !important;
+  border-color: #2d3b56 !important;
+}
+
+.dark input:focus,
+.dark select:focus,
+.dark textarea:focus {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2) !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #64748b !important;
+}
+
+/* Table Hover States in Dark Mode */
+.dark tr.hover\:bg-slate-50\/60:hover,
+.dark tr.hover\:bg-slate-50:hover,
+.dark .hover\:bg-slate-50:hover,
+.dark .hover\:bg-slate-50\/60:hover {
+  background-color: #182234 !important;
+}
+
+.dark .hover\:bg-slate-100:hover {
+  background-color: #1f293d !important;
+}
+
+.dark .hover\:bg-slate-200:hover {
+  background-color: #2d3b56 !important;
+}
+
+/* Subtle Glow for Modern Dark Cards */
+.dark .shadow-2xs,
+.dark .shadow-xs,
+.dark .shadow-sm,
+.dark .shadow-md {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35) !important;
+}
+
+.dark .shadow-2xl {
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.7) !important;
+}
+
+/* Badges harmonization in Dark Mode */
+.dark .bg-emerald-50 {
+  background-color: rgba(6, 78, 59, 0.35) !important;
+  color: #34d399 !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+}
+
+.dark .bg-blue-50 {
+  background-color: rgba(30, 58, 138, 0.35) !important;
+  color: #60a5fa !important;
+  border-color: rgba(59, 130, 246, 0.3) !important;
+}
+
+.dark .bg-amber-50 {
+  background-color: rgba(120, 53, 15, 0.35) !important;
+  color: #fbbf24 !important;
+  border-color: rgba(245, 158, 11, 0.3) !important;
+}
+
+.dark .bg-rose-50 {
+  background-color: rgba(136, 19, 55, 0.35) !important;
+  color: #fb7185 !important;
+  border-color: rgba(244, 63, 94, 0.3) !important;
+}
+
+/* =========================================================================
+   PRINT SPECIFIC RULES
+   Ensures printable invoices, shift sheets, and reports always print in crisp,
+   spacious Moroccan A4 commercial stationery layout
+   ========================================================================= */
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 8mm 10mm;
+  }
+
+  html, body, #root, #root > div, main, .overflow-hidden, .overflow-y-auto {
+    background: white !important;
+    color: #0f172a !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .no-print, [class*="print:hidden"], nav, aside, header {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  .print-break-inside-avoid,
+  .print-avoid-break {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Reset modal overlay containers during print to allow unrestricted multi-page flow */
+  .fixed.inset-0 {
+    position: static !important;
+    display: block !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .fixed.inset-0 > div {
+    max-width: 100% !important;
+    max-height: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    overflow: visible !important;
+    width: 100% !important;
+    height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+  }
+
+  #printable-purchase-invoice,
+  #printable-commercial-doc,
+  #printable-fiche-cloture,
+  #printable-cpc {
+    background: white !important;
+    color: #0f172a !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* Table multi-page splitting: keep rows whole, do not cut midway across a row */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+  }
+
+  thead {
+    display: table-header-group !important;
+  }
+
+  tfoot {
+    display: table-footer-group !important;
+  }
+
+  tr, td, th {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+}

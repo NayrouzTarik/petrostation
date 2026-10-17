@@ -1,0 +1,6 @@
+{
+  "name": "StationHub - Plateforme de Gestion de Station-Service",
+  "description": "Plateforme complète de gestion de stations-service: Backoffice administration multi-stations, espace gérant de station fidèle au PDF (saisie journalière des pistolets, citernes, produits, services, encaissements, achats, dépenses, facturation B2B, devis, BL et 8 rapports financiers avec archivage).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

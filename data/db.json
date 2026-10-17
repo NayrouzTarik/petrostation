@@ -1,0 +1,2541 @@
+{
+  "users": [
+    {
+      "id": "user-admin-1",
+      "email": "admin@station.com",
+      "password": "Nayibra@2026",
+      "name": "Administrateur Propriétaire (Owner)",
+      "role": "SUPER_ADMIN",
+      "phone": "+212 661-000000",
+      "status": "ACTIF",
+      "createdAt": "2026-01-10T08:00:00Z"
+    },
+    {
+      "id": "user-gerant-1",
+      "email": "gerant.sidiismail@stationhub.ma",
+      "password": "Gerant@2026!",
+      "name": "Rachid Tazi (Gérant)",
+      "role": "GERANT",
+      "stationId": "station-winxo-sidi-ismail",
+      "phone": "+212 663-889900",
+      "createdAt": "2026-01-15T09:00:00Z"
+    },
+    {
+      "id": "user-compta-1",
+      "email": "expert.comptable@cabinet-fiduciaire.ma",
+      "password": "Compta@2026!",
+      "name": "Fatima Zahra Benali (Expert-Comptable)",
+      "role": "EXPERT_COMPTABLE",
+      "stationId": "station-winxo-sidi-ismail",
+      "phone": "+212 522-445566",
+      "createdAt": "2026-01-16T10:00:00Z"
+    },
+    {
+      "id": "user-gerant-2",
+      "email": "gerant.oasis@stationhub.ma",
+      "password": "Oasis@2026!",
+      "name": "Omar Chraibi (Gérant Oasis)",
+      "role": "GERANT",
+      "stationId": "station-afriquia-oasis",
+      "phone": "+212 662-771122",
+      "createdAt": "2026-02-01T09:00:00Z",
+      "status": "ACTIF"
+    },
+    {
+      "id": "user-gerant-1792249316994",
+      "email": "mehdi.alami@shell-agdal.ma",
+      "name": "Mehdi Alami",
+      "password": "Agdal@2026!",
+      "role": "GERANT",
+      "stationId": "station-1792249316994",
+      "phone": "+212 661-998877",
+      "status": "ACTIF",
+      "createdAt": "2026-10-17T15:01:56.994Z"
+    },
+    {
+      "id": "user-gerant-1792253724740",
+      "email": "ntarik@gmail.com",
+      "name": "Nayrouz Tarik",
+      "password": "Nayibra@2026",
+      "role": "GERANT",
+      "stationId": "station-1792253724740",
+      "phone": "",
+      "createdAt": "2026-10-17T16:15:24.740Z"
+    },
+    {
+      "id": "user-compta-1792253724740",
+      "email": "ibaddah@gmail.com",
+      "name": "ibrahim baddah ",
+      "password": "Nayibra@2026",
+      "role": "EXPERT_COMPTABLE",
+      "stationId": "station-1792253724740",
+      "phone": "",
+      "createdAt": "2026-10-17T16:15:24.740Z",
+      "status": "ACTIF"
+    }
+  ],
+  "stations": [
+    {
+      "id": "station-winxo-sidi-ismail",
+      "name": "Station Winxo Sidi Ismail",
+      "code": "ST-WX-01",
+      "brand": "Winxo",
+      "location": "Route Nationale 1, Km 14, Sidi Ismail",
+      "city": "El Jadida",
+      "logoUrl": "/src/assets/images/station_modern_exterior_1792246841660.jpg",
+      "companyName": "STE SIDI ISMAIL DISTRIBUTION SARL",
+      "ice": "001594832000045",
+      "patente": "34120984",
+      "rc": "45892 El Jadida",
+      "phone": "+212 523-345678",
+      "email": "contact@winxo-sidiismail.ma",
+      "managerId": "user-gerant-1",
+      "accountantId": "user-compta-1",
+      "createdAt": "2026-01-15T09:00:00Z",
+      "status": "ACTIVE"
+    },
+    {
+      "id": "station-afriquia-oasis",
+      "name": "Station Afriquia Oasis",
+      "code": "ST-AF-02",
+      "brand": "Afriquia",
+      "location": "Boulevard de la Mecque, Quartier Oasis",
+      "city": "Casablanca",
+      "logoUrl": "/src/assets/images/station_modern_exterior_1792246841660.jpg",
+      "companyName": "STE OASIS PETROLEUM SERVICES SARL",
+      "ice": "002874129000033",
+      "patente": "12984501",
+      "rc": "349012 Casablanca",
+      "phone": "+212 522-998877",
+      "email": "station.oasis@afriquia-casablanca.ma",
+      "managerId": "user-gerant-2",
+      "createdAt": "2026-02-01T09:00:00Z",
+      "status": "ACTIVE"
+    },
+    {
+      "id": "station-1792249316994",
+      "name": "Station Shell Agdal",
+      "code": "ST-6994",
+      "brand": "Shell",
+      "location": "Avenue de France, Agdal",
+      "city": "Rabat",
+      "logoUrl": "/src/assets/images/station_modern_exterior_1792246841660.jpg",
+      "companyName": "STATION SHELL AGDAL SARL",
+      "ice": "004093863882057",
+      "patente": "78598969",
+      "rc": "43295 Rabat",
+      "phone": "+212 661-998877",
+      "email": "mehdi.alami@shell-agdal.ma",
+      "managerId": "user-gerant-1792249316994",
+      "createdAt": "2026-10-17T15:01:56.994Z",
+      "status": "ACTIVE"
+    },
+    {
+      "id": "station-1792253724740",
+      "name": "Nayrouz Tarik",
+      "code": "ST-4740",
+      "brand": "Shell",
+      "location": "HAY SALAM AVENUE ASSAHARA SECT 8 N1037",
+      "city": "SALE",
+      "logoUrl": "/src/assets/images/station_modern_exterior_1792246841660.jpg",
+      "companyName": "Nayrouz Tarik",
+      "ice": "",
+      "patente": "",
+      "rc": "",
+      "phone": "",
+      "email": "ntarik@gmail.com",
+      "managerId": "user-gerant-1792253724740",
+      "accountantId": "user-compta-1792253724740",
+      "createdAt": "2026-10-17T16:15:24.740Z",
+      "status": "ACTIVE"
+    }
+  ],
+  "carburants": [
+    {
+      "id": "carb-gas-1",
+      "stationId": "station-winxo-sidi-ismail",
+      "name": "Gasoil",
+      "code": "GAS",
+      "pricePerLiter": 15.92,
+      "color": "#0f172a",
+      "history": [
+        {
+          "date": "2026-09-01",
+          "price": 15.75,
+          "updatedBy": "Karim Alami"
+        },
+        {
+          "date": "2026-10-01",
+          "price": 15.92,
+          "updatedBy": "Karim Alami"
+        }
+      ]
+    },
+    {
+      "id": "carb-ssp-1",
+      "stationId": "station-winxo-sidi-ismail",
+      "name": "SSP",
+      "code": "SSP",
+      "pricePerLiter": 15.62,
+      "color": "#16a34a",
+      "history": [
+        {
+          "date": "2026-09-01",
+          "price": 15.4,
+          "updatedBy": "Karim Alami"
+        },
+        {
+          "date": "2026-10-01",
+          "price": 15.62,
+          "updatedBy": "Karim Alami"
+        }
+      ]
+    },
+    {
+      "id": "carb-gas-2",
+      "stationId": "station-afriquia-oasis",
+      "name": "Gasoil",
+      "code": "GAS",
+      "pricePerLiter": 15.9,
+      "color": "#0f172a",
+      "history": [
+        {
+          "date": "2026-10-01",
+          "price": 15.9,
+          "updatedBy": "Karim Alami"
+        }
+      ]
+    },
+    {
+      "id": "carb-ssp-2",
+      "stationId": "station-afriquia-oasis",
+      "name": "SSP",
+      "code": "SSP",
+      "pricePerLiter": 15.6,
+      "color": "#16a34a",
+      "history": [
+        {
+          "date": "2026-10-01",
+          "price": 15.6,
+          "updatedBy": "Karim Alami"
+        }
+      ]
+    },
+    {
+      "id": "carb-gas-1792249316994",
+      "stationId": "station-1792249316994",
+      "name": "Gasoil",
+      "code": "GAS",
+      "pricePerLiter": 15.92,
+      "color": "#0f172a",
+      "history": [
+        {
+          "date": "2026-10-17",
+          "price": 15.92,
+          "updatedBy": "Mehdi Alami"
+        }
+      ]
+    },
+    {
+      "id": "carb-ssp-1792249316994",
+      "stationId": "station-1792249316994",
+      "name": "SSP",
+      "code": "SSP",
+      "pricePerLiter": 15.62,
+      "color": "#16a34a",
+      "history": [
+        {
+          "date": "2026-10-17",
+          "price": 15.62,
+          "updatedBy": "Mehdi Alami"
+        }
+      ]
+    },
+    {
+      "id": "carb-gas-1792253724740",
+      "stationId": "station-1792253724740",
+      "name": "Gasoil",
+      "code": "GAS",
+      "pricePerLiter": 15.92,
+      "color": "#0f172a",
+      "history": [
+        {
+          "date": "2026-10-17",
+          "price": 15.92,
+          "updatedBy": "Admin"
+        },
+        {
+          "date": "2026-10-17",
+          "price": 15,
+          "updatedBy": "Gérant"
+        },
+        {
+          "date": "2026-10-17",
+          "price": 15.93,
+          "updatedBy": "Gérant"
+        },
+        {
+          "date": "2026-10-17",
+          "price": 15.92,
+          "updatedBy": "Gérant"
+        }
+      ]
+    },
+    {
+      "id": "carb-ssp-1792253724740",
+      "stationId": "station-1792253724740",
+      "name": "SSP",
+      "code": "SSP",
+      "pricePerLiter": 15.62,
+      "color": "#16a34a",
+      "history": [
+        {
+          "date": "2026-10-17",
+          "price": 15.62,
+          "updatedBy": "Admin"
+        }
+      ]
+    }
+  ],
+  "citernes": [
+    {
+      "id": "cit-cgas-1",
+      "stationId": "station-winxo-sidi-ismail",
+      "name": "CGAS",
+      "carburantCode": "GAS",
+      "capacity": 25000,
+      "minAlertLevel": 3000,
+      "currentStock": 14850,
+      "lastJaugeageDate": "2026-10-16"
+    },
+    {
+      "id": "cit-cssp-1",
+      "stationId": "station-winxo-sidi-ismail",
+      "name": "CSSP",
+      "carburantCode": "SSP",
+      "capacity": 18000,
+      "minAlertLevel": 2500,
+      "currentStock": 10400,
+      "lastJaugeageDate": "2026-10-16"
+    },
+    {
+      "id": "cit-cgas-2",
+      "stationId": "station-afriquia-oasis",
+      "name": "CGAS",
+      "carburantCode": "GAS",
+      "capacity": 30000,
+      "minAlertLevel": 4000,
+      "currentStock": 18200,
+      "lastJaugeageDate": "2026-10-16"
+    },
+    {
+      "id": "cit-cssp-2",
+      "stationId": "station-afriquia-oasis",
+      "name": "CSSP",
+      "carburantCode": "SSP",
+      "capacity": 20000,
+      "minAlertLevel": 3000,
+      "currentStock": 12500,
+      "lastJaugeageDate": "2026-10-16"
+    },
+    {
+      "id": "cit-gas-1792249316994",
+      "stationId": "station-1792249316994",
+      "name": "CGAS",
+      "carburantCode": "GAS",
+      "capacity": 25000,
+      "minAlertLevel": 3000,
+      "currentStock": 12000,
+      "lastJaugeageDate": "2026-10-17"
+    },
+    {
+      "id": "cit-ssp-1792249316994",
+      "stationId": "station-1792249316994",
+      "name": "CSSP",
+      "carburantCode": "SSP",
+      "capacity": 18000,
+      "minAlertLevel": 2500,
+      "currentStock": 9000,
+      "lastJaugeageDate": "2026-10-17"
+    },
+    {
+      "id": "cit-gas-1792253724741",
+      "stationId": "station-1792253724740",
+      "name": "CGAS",
+      "carburantCode": "GAS",
+      "capacity": 25000,
+      "minAlertLevel": 2500,
+      "currentStock": 240000,
+      "lastJaugeageDate": "2026-10-17"
+    },
+    {
+      "id": "cit-ssp-1792253724741",
+      "stationId": "station-1792253724740",
+      "name": "CSSP",
+      "carburantCode": "SSP",
+      "capacity": 15000,
+      "minAlertLevel": 2000,
+      "currentStock": 8000,
+      "lastJaugeageDate": "2026-10-17"
+    }
+  ],
+  "jaugeages": [
+    {
+      "id": "jaug-init-1",
+      "stationId": "station-winxo-sidi-ismail",
+      "date": "2026-10-16",
+      "citerneId": "cit-cgas-1",
+      "citerneName": "CGAS",
+      "carburantCode": "GAS",
+      "stockTheorique": 14850,
+      "stockReel": 14850,
+      "ecart": 0
+    },
+    {
+      "id": "jaug-init-2",
+      "stationId": "station-winxo-sidi-ismail",
+      "date": "2026-10-16",
+      "citerneId": "cit-cssp-1",
+      "citerneName": "CSSP",
+      "carburantCode": "SSP",
+      "stockTheorique": 10400,
+      "stockReel": 10400,
+      "ecart": 0
+    },
+    {
+      "id": "jaug-1792254328690-cit-gas-1792253724741",
+      "stationId": "station-1792253724740",
+      "date": "2026-10-17",
+      "citerneId": "cit-gas-1792253724741",
+      "citerneName": "CGAS",
+      "carburantCode": "GAS",
+      "stockTheorique": 10000,
+      "stockReel": 10000,
+      "ecart": 0
+    },
+    {
+      "id": "jaug-1792254328690-cit-ssp-1792253724741",
+      "stationId": "station-1792253724740",
+      "date": "2026-10-17",
+      "citerneId": "cit-ssp-1792253724741",
+      "citerneName": "CSSP",
+      "carburantCode": "SSP",
+      "stockTheorique": 8000,
+      "stockReel": 9000,
+      "ecart": 1000
+    },
+    {
+      "id": "jaug-1792254360345-cit-gas-1792253724741",
+      "stationId": "station-1792253724740",
+      "date": "2026-10-17",
+      "citerneId": "cit-gas-1792253724741",
+      "citerneName": "CGAS",
+      "carburantCode": "GAS",
+      "stockTheorique": 10000,
+      "stockReel": 10000,
+      "ecart": 0
+    },
+    {
+      "id": "jaug-1792254360345-cit-ssp-1792253724741",
+      "stationId": "station-1792253724740",
+      "date": "2026-10-17",
+      "citerneId": "cit-ssp-1792253724741",
+      "citerneName": "CSSP",
+      "carburantCode": "SSP",
+      "stockTheorique": 9000,
+      "stockReel": 7000,
+      "ecart": -2000
+    },
+    {
+      "id": "jaug-1792254473392-cit-gas-1792253724741",
+      "stationId": "station-1792253724740",
+      "date": "2026-10-17",
+      "citerneId": "cit-gas-1792253724741",
+      "citerneName": "CGAS",
+      "carburantCode": "GAS",
+      "stockTheorique": 10000,
+      "stockReel": 800000,
+      "ecart": 790000
+    },
+    {
+      "id": "jaug-1792254473392-cit-ssp-1792253724741",
+      "stationId": "station-1792253724740",
+      "date": "2026-10-17",
+      "citerneId": "cit-ssp-1792253724741",
+      "citerneName": "CSSP",
+      "carburantCode": "SSP",
+      "stockTheorique": 7000,
+      "stockReel": 7000,
+      "ecart": 0
+    },
+    {
+      "id": "jaug-1792254482085-cit-gas-1792253724741",
+      "stationId": "station-1792253724740",
+      "date": "2026-10-17",
+      "citerneId": "cit-gas-1792253724741",
+      "citerneName": "CGAS",
+      "carburantCode": "GAS",
+      "stockTheorique": 800000,
+      "stockReel": 10,
+      "ecart": -799990
+    },
+    {
+      "id": "jaug-1792254482085-cit-ssp-1792253724741",
+      "stationId": "station-1792253724740",
+      "date": "2026-10-17",
+      "citerneId": "cit-ssp-1792253724741",
+      "citerneName": "CSSP",
+      "carburantCode": "SSP",
+      "stockTheorique": 7000,
+      "stockReel": 7000,
+      "ecart": 0
+    },
+    {
+      "id": "jaug-1792254494277-cit-gas-1792253724741",
+      "stationId": "station-1792253724740",
+      "date": "2026-10-17",
+      "citerneId": "cit-gas-1792253724741",
+      "citerneName": "CGAS",
+      "carburantCode": "GAS",
+      "stockTheorique": 10,
+      "stockReel": 250000,
+      "ecart": 249990
+    },
+    {
+      "id": "jaug-1792254494277-cit-ssp-1792253724741",
+      "stationId": "station-1792253724740",
+      "date": "2026-10-17",
+      "citerneId": "cit-ssp-1792253724741",
+      "citerneName": "CSSP",
+      "carburantCode": "SSP",
+      "stockTheorique": 7000,
+      "stockReel": 7000,
+      "ecart": 0
+    },
+    {
+      "id": "jaug-1792266069252-cit-gas-1792253724741",
+      "stationId": "station-1792253724740",
+      "date": "2026-10-17",
+      "citerneId": "cit-gas-1792253724741",
+      "citerneName": "CGAS",
+      "carburantCode": "GAS",
+      "stockTheorique": 250000,
+      "stockReel": 240000,
+      "ecart": -10000
+    },
+    {
+      "id": "jaug-1792266069252-cit-ssp-1792253724741",
+      "stationId": "station-1792253724740",
+      "date": "2026-10-17",
+      "citerneId": "cit-ssp-1792253724741",
+      "citerneName": "CSSP",
+      "carburantCode": "SSP",
+      "stockTheorique": 7000,
+      "stockReel": 8000,
+      "ecart": 1000
+    }
+  ],
+  "pistolets": [
+    {
+      "id": "pist-1",
+      "stationId": "station-winxo-sidi-ismail",
+      "code": "P1",
+      "citerneId": "cit-cgas-1",
+      "carburantCode": "GAS",
+      "currentIndex": 18717,
+      "initialIndex": 18717
+    },
+    {
+      "id": "pist-2",
+      "stationId": "station-winxo-sidi-ismail",
+      "code": "P2",
+      "citerneId": "cit-cssp-1",
+      "carburantCode": "SSP",
+      "currentIndex": 14470,
+      "initialIndex": 14470
+    },
+    {
+      "id": "pist-3",
+      "stationId": "station-winxo-sidi-ismail",
+      "code": "P3",
+      "citerneId": "cit-cgas-1",
+      "carburantCode": "GAS",
+      "currentIndex": 7335,
+      "initialIndex": 7335
+    },
+    {
+      "id": "pist-4",
+      "stationId": "station-winxo-sidi-ismail",
+      "code": "P4",
+      "citerneId": "cit-cgas-1",
+      "carburantCode": "GAS",
+      "currentIndex": 19742,
+      "initialIndex": 19742
+    },
+    {
+      "id": "pist-5",
+      "stationId": "station-winxo-sidi-ismail",
+      "code": "P5",
+      "citerneId": "cit-cgas-1",
+      "carburantCode": "GAS",
+      "currentIndex": 11687,
+      "initialIndex": 11687
+    },
+    {
+      "id": "pist-6",
+      "stationId": "station-winxo-sidi-ismail",
+      "code": "P6",
+      "citerneId": "cit-cgas-1",
+      "carburantCode": "GAS",
+      "currentIndex": 8465,
+      "initialIndex": 8465
+    },
+    {
+      "id": "pist-7",
+      "stationId": "station-winxo-sidi-ismail",
+      "code": "P7",
+      "citerneId": "cit-cssp-1",
+      "carburantCode": "SSP",
+      "currentIndex": 5621,
+      "initialIndex": 5621
+    },
+    {
+      "id": "pist-8",
+      "stationId": "station-winxo-sidi-ismail",
+      "code": "P8",
+      "citerneId": "cit-cgas-1",
+      "carburantCode": "GAS",
+      "currentIndex": 9442,
+      "initialIndex": 9442
+    },
+    {
+      "id": "pist-station-1792249316994-1",
+      "stationId": "station-1792249316994",
+      "code": "P1",
+      "citerneId": "cit-gas-1792249316994",
+      "carburantCode": "GAS",
+      "currentIndex": 1000,
+      "initialIndex": 1000
+    },
+    {
+      "id": "pist-station-1792249316994-2",
+      "stationId": "station-1792249316994",
+      "code": "P2",
+      "citerneId": "cit-ssp-1792249316994",
+      "carburantCode": "SSP",
+      "currentIndex": 2000,
+      "initialIndex": 2000
+    },
+    {
+      "id": "pist-station-1792249316994-3",
+      "stationId": "station-1792249316994",
+      "code": "P3",
+      "citerneId": "cit-gas-1792249316994",
+      "carburantCode": "GAS",
+      "currentIndex": 3000,
+      "initialIndex": 3000
+    },
+    {
+      "id": "pist-station-1792249316994-4",
+      "stationId": "station-1792249316994",
+      "code": "P4",
+      "citerneId": "cit-gas-1792249316994",
+      "carburantCode": "GAS",
+      "currentIndex": 4000,
+      "initialIndex": 4000
+    },
+    {
+      "id": "pist-station-1792249316994-5",
+      "stationId": "station-1792249316994",
+      "code": "P5",
+      "citerneId": "cit-ssp-1792249316994",
+      "carburantCode": "SSP",
+      "currentIndex": 5000,
+      "initialIndex": 5000
+    },
+    {
+      "id": "pist-station-1792249316994-6",
+      "stationId": "station-1792249316994",
+      "code": "P6",
+      "citerneId": "cit-gas-1792249316994",
+      "carburantCode": "GAS",
+      "currentIndex": 6000,
+      "initialIndex": 6000
+    },
+    {
+      "id": "pist-station-1792253724740-1",
+      "stationId": "station-1792253724740",
+      "code": "P1",
+      "citerneId": "cit-gas-1792253724741",
+      "carburantCode": "GAS",
+      "currentIndex": 1000,
+      "initialIndex": 1000,
+      "lastCalibrageDate": "2026-10-17"
+    },
+    {
+      "id": "pist-station-1792253724740-2",
+      "stationId": "station-1792253724740",
+      "code": "P2",
+      "citerneId": "cit-ssp-1792253724741",
+      "carburantCode": "SSP",
+      "currentIndex": 2000,
+      "initialIndex": 1000,
+      "lastCalibrageDate": "2026-10-17"
+    },
+    {
+      "id": "pist-station-1792253724740-3",
+      "stationId": "station-1792253724740",
+      "code": "P3",
+      "citerneId": "cit-gas-1792253724741",
+      "carburantCode": "GAS",
+      "currentIndex": 1000,
+      "initialIndex": 1000,
+      "lastCalibrageDate": "2026-10-17"
+    },
+    {
+      "id": "pist-station-1792253724740-4",
+      "stationId": "station-1792253724740",
+      "code": "P4",
+      "citerneId": "cit-gas-1792253724741",
+      "carburantCode": "GAS",
+      "currentIndex": 1000,
+      "initialIndex": 1000,
+      "lastCalibrageDate": "2026-10-17"
+    },
+    {
+      "id": "pist-station-1792253724740-5",
+      "stationId": "station-1792253724740",
+      "code": "P5",
+      "citerneId": "cit-gas-1792253724741",
+      "carburantCode": "GAS",
+      "currentIndex": 1000,
+      "initialIndex": 1000,
+      "lastCalibrageDate": "2026-10-17"
+    },
+    {
+      "id": "pist-station-1792253724740-6",
+      "stationId": "station-1792253724740",
+      "code": "P6",
+      "citerneId": "cit-gas-1792253724741",
+      "carburantCode": "GAS",
+      "currentIndex": 6000,
+      "initialIndex": 1000,
+      "lastCalibrageDate": "2026-10-17"
+    },
+    {
+      "id": "pist-station-1792253724740-7",
+      "stationId": "station-1792253724740",
+      "code": "P7",
+      "citerneId": "cit-ssp-1792253724741",
+      "carburantCode": "SSP",
+      "currentIndex": 500,
+      "initialIndex": 1000,
+      "lastCalibrageDate": "2026-10-17"
+    },
+    {
+      "id": "pist-station-1792253724740-8",
+      "stationId": "station-1792253724740",
+      "code": "P8",
+      "citerneId": "cit-gas-1792253724741",
+      "carburantCode": "GAS",
+      "currentIndex": 1000,
+      "initialIndex": 1000,
+      "lastCalibrageDate": "2026-10-17"
+    }
+  ],
+  "calibrages": [
+    {
+      "id": "calib-1792255501912-pist-station-1792253724740-1",
+      "stationId": "station-1792253724740",
+      "pistoletId": "pist-station-1792253724740-1",
+      "pistoletCode": "P1",
+      "date": "2026-10-17",
+      "indexActuel": 1000,
+      "nouveauIndex": 1000,
+      "difference": 0,
+      "motif": "Étalonnage de maintenance"
+    },
+    {
+      "id": "calib-1792255501912-pist-station-1792253724740-2",
+      "stationId": "station-1792253724740",
+      "pistoletId": "pist-station-1792253724740-2",
+      "pistoletCode": "P2",
+      "date": "2026-10-17",
+      "indexActuel": 1000,
+      "nouveauIndex": 1000,
+      "difference": 0,
+      "motif": "Étalonnage de maintenance"
+    },
+    {
+      "id": "calib-1792255501912-pist-station-1792253724740-3",
+      "stationId": "station-1792253724740",
+      "pistoletId": "pist-station-1792253724740-3",
+      "pistoletCode": "P3",
+      "date": "2026-10-17",
+      "indexActuel": 1000,
+      "nouveauIndex": 1000,
+      "difference": 0,
+      "motif": "Étalonnage de maintenance"
+    },
+    {
+      "id": "calib-1792255501912-pist-station-1792253724740-4",
+      "stationId": "station-1792253724740",
+      "pistoletId": "pist-station-1792253724740-4",
+      "pistoletCode": "P4",
+      "date": "2026-10-17",
+      "indexActuel": 1000,
+      "nouveauIndex": 1000,
+      "difference": 0,
+      "motif": "Étalonnage de maintenance"
+    },
+    {
+      "id": "calib-1792255501912-pist-station-1792253724740-5",
+      "stationId": "station-1792253724740",
+      "pistoletId": "pist-station-1792253724740-5",
+      "pistoletCode": "P5",
+      "date": "2026-10-17",
+      "indexActuel": 1000,
+      "nouveauIndex": 1000,
+      "difference": 0,
+      "motif": "Étalonnage de maintenance"
+    },
+    {
+      "id": "calib-1792255501912-pist-station-1792253724740-6",
+      "stationId": "station-1792253724740",
+      "pistoletId": "pist-station-1792253724740-6",
+      "pistoletCode": "P6",
+      "date": "2026-10-17",
+      "indexActuel": 1000,
+      "nouveauIndex": 5000,
+      "difference": 4000,
+      "motif": "Étalonnage de maintenance"
+    },
+    {
+      "id": "calib-1792255501912-pist-station-1792253724740-7",
+      "stationId": "station-1792253724740",
+      "pistoletId": "pist-station-1792253724740-7",
+      "pistoletCode": "P7",
+      "date": "2026-10-17",
+      "indexActuel": 1000,
+      "nouveauIndex": 1000,
+      "difference": 0,
+      "motif": "Étalonnage de maintenance"
+    },
+    {
+      "id": "calib-1792255501912-pist-station-1792253724740-8",
+      "stationId": "station-1792253724740",
+      "pistoletId": "pist-station-1792253724740-8",
+      "pistoletCode": "P8",
+      "date": "2026-10-17",
+      "indexActuel": 1000,
+      "nouveauIndex": 1000,
+      "difference": 0,
+      "motif": "Étalonnage de maintenance"
+    },
+    {
+      "id": "calib-1792266082799-pist-station-1792253724740-1",
+      "stationId": "station-1792253724740",
+      "pistoletId": "pist-station-1792253724740-1",
+      "pistoletCode": "P1",
+      "date": "2026-10-17",
+      "indexActuel": 1000,
+      "nouveauIndex": 1000,
+      "difference": 0,
+      "motif": "Étalonnage de maintenance"
+    },
+    {
+      "id": "calib-1792266082799-pist-station-1792253724740-2",
+      "stationId": "station-1792253724740",
+      "pistoletId": "pist-station-1792253724740-2",
+      "pistoletCode": "P2",
+      "date": "2026-10-17",
+      "indexActuel": 1000,
+      "nouveauIndex": 1000,
+      "difference": 0,
+      "motif": "Étalonnage de maintenance"
+    },
+    {
+      "id": "calib-1792266082799-pist-station-1792253724740-3",
+      "stationId": "station-1792253724740",
+      "pistoletId": "pist-station-1792253724740-3",
+      "pistoletCode": "P3",
+      "date": "2026-10-17",
+      "indexActuel": 1000,
+      "nouveauIndex": 1000,
+      "difference": 0,
+      "motif": "Étalonnage de maintenance"
+    },
+    {
+      "id": "calib-1792266082799-pist-station-1792253724740-4",
+      "stationId": "station-1792253724740",
+      "pistoletId": "pist-station-1792253724740-4",
+      "pistoletCode": "P4",
+      "date": "2026-10-17",
+      "indexActuel": 1000,
+      "nouveauIndex": 1000,
+      "difference": 0,
+      "motif": "Étalonnage de maintenance"
+    },
+    {
+      "id": "calib-1792266082799-pist-station-1792253724740-5",
+      "stationId": "station-1792253724740",
+      "pistoletId": "pist-station-1792253724740-5",
+      "pistoletCode": "P5",
+      "date": "2026-10-17",
+      "indexActuel": 1000,
+      "nouveauIndex": 1000,
+      "difference": 0,
+      "motif": "Étalonnage de maintenance"
+    },
+    {
+      "id": "calib-1792266082799-pist-station-1792253724740-6",
+      "stationId": "station-1792253724740",
+      "pistoletId": "pist-station-1792253724740-6",
+      "pistoletCode": "P6",
+      "date": "2026-10-17",
+      "indexActuel": 5000,
+      "nouveauIndex": 6000,
+      "difference": 1000,
+      "motif": "Étalonnage de maintenance"
+    },
+    {
+      "id": "calib-1792266082799-pist-station-1792253724740-7",
+      "stationId": "station-1792253724740",
+      "pistoletId": "pist-station-1792253724740-7",
+      "pistoletCode": "P7",
+      "date": "2026-10-17",
+      "indexActuel": 1000,
+      "nouveauIndex": 500,
+      "difference": -500,
+      "motif": "Étalonnage de maintenance"
+    },
+    {
+      "id": "calib-1792266082799-pist-station-1792253724740-8",
+      "stationId": "station-1792253724740",
+      "pistoletId": "pist-station-1792253724740-8",
+      "pistoletCode": "P8",
+      "date": "2026-10-17",
+      "indexActuel": 1000,
+      "nouveauIndex": 1000,
+      "difference": 0,
+      "motif": "Étalonnage de maintenance"
+    },
+    {
+      "id": "calib-1792268954843-pist-station-1792253724740-2",
+      "stationId": "station-1792253724740",
+      "pistoletId": "pist-station-1792253724740-2",
+      "pistoletCode": "P2",
+      "date": "2026-10-17",
+      "indexActuel": 1000,
+      "nouveauIndex": 2000,
+      "difference": 1000,
+      "motif": "Modification directe / Ajustement index"
+    },
+    {
+      "id": "calib-1792270056602-pist-station-1792253724740-1",
+      "stationId": "station-1792253724740",
+      "pistoletId": "pist-station-1792253724740-1",
+      "pistoletCode": "P1",
+      "date": "2026-10-17",
+      "indexActuel": 1000,
+      "nouveauIndex": 101,
+      "difference": -899,
+      "motif": "Modification directe / Ajustement index"
+    },
+    {
+      "id": "calib-1792270062911-pist-station-1792253724740-1",
+      "stationId": "station-1792253724740",
+      "pistoletId": "pist-station-1792253724740-1",
+      "pistoletCode": "P1",
+      "date": "2026-10-17",
+      "indexActuel": 101,
+      "nouveauIndex": 1000,
+      "difference": 899,
+      "motif": "Modification directe / Ajustement index"
+    }
+  ],
+  "salaries": [
+    {
+      "id": "sal-1",
+      "stationId": "station-winxo-sidi-ismail",
+      "name": "GERANT",
+      "matricule": "GER-001",
+      "role": "GERANT",
+      "phone": "+212 663-889900",
+      "dateEmbauche": "2025-01-01",
+      "actif": true
+    },
+    {
+      "id": "sal-2",
+      "stationId": "station-winxo-sidi-ismail",
+      "name": "POMPISTE 1",
+      "matricule": "POMP-001",
+      "role": "POMPISTE",
+      "phone": "+212 664-112233",
+      "dateEmbauche": "2025-02-15",
+      "actif": true
+    },
+    {
+      "id": "sal-3",
+      "stationId": "station-winxo-sidi-ismail",
+      "name": "POMPISTE 2",
+      "matricule": "POMP-002",
+      "role": "POMPISTE",
+      "phone": "+212 665-223344",
+      "dateEmbauche": "2025-03-01",
+      "actif": true
+    },
+    {
+      "id": "sal-ger-1792249316995",
+      "stationId": "station-1792249316994",
+      "name": "Mehdi Alami",
+      "matricule": "GER-001",
+      "role": "GERANT",
+      "dateEmbauche": "2026-10-17",
+      "actif": true
+    },
+    {
+      "id": "sal-ger-1792253724741",
+      "stationId": "station-1792253724740",
+      "name": "GERANT",
+      "matricule": "GER-001",
+      "role": "GERANT",
+      "dateEmbauche": "2026-10-17",
+      "actif": true
+    },
+    {
+      "id": "sal-pomp1-1792253724741",
+      "stationId": "station-1792253724740",
+      "name": "POMPISTE 1",
+      "matricule": "POMP-001",
+      "role": "POMPISTE",
+      "dateEmbauche": "2026-10-17",
+      "actif": true
+    },
+    {
+      "id": "sal-pomp2-1792253724741",
+      "stationId": "station-1792253724740",
+      "name": "POMPISTE 2",
+      "matricule": "POMP-004",
+      "role": "POMPISTE",
+      "dateEmbauche": "2026-10-17",
+      "actif": true,
+      "phone": ""
+    },
+    {
+      "id": "sal-1792255606328",
+      "stationId": "station-1792253724740",
+      "name": "pom",
+      "matricule": "M-881",
+      "role": "POMPISTE",
+      "phone": "+2189556565",
+      "dateEmbauche": "2026-10-17",
+      "actif": true
+    }
+  ],
+  "tiers": [
+    {
+      "id": "tier-banque",
+      "stationId": "station-winxo-sidi-ismail",
+      "name": "BANQUE",
+      "type": "Banque",
+      "solde": 185400,
+      "encoursAutorise": 500000
+    },
+    {
+      "id": "tier-caisse",
+      "stationId": "station-winxo-sidi-ismail",
+      "name": "CAISSE ESPECES",
+      "type": "Caisse",
+      "solde": 28650,
+      "encoursAutorise": 100000
+    },
+    {
+      "id": "tier-c-sans-nom",
+      "stationId": "station-winxo-sidi-ismail",
+      "name": "C SANS NOM",
+      "type": "Client",
+      "solde": 0,
+      "encoursAutorise": 0
+    },
+    {
+      "id": "tier-f-sans-nom",
+      "stationId": "station-winxo-sidi-ismail",
+      "name": "F SANS NOM",
+      "type": "Fournisseur",
+      "solde": 0,
+      "encoursAutorise": 0
+    },
+    {
+      "id": "tier-winxo",
+      "stationId": "station-winxo-sidi-ismail",
+      "name": "WINXO",
+      "type": "Fournisseur",
+      "solde": -125400,
+      "encoursAutorise": 300000,
+      "ice": "001509384000092",
+      "phone": "+212 522-300000"
+    },
+    {
+      "id": "tier-trans-doukkala",
+      "stationId": "station-winxo-sidi-ismail",
+      "name": "STE TRANSPORT DOUKKALA",
+      "type": "Client",
+      "solde": 14250,
+      "encoursAutorise": 40000,
+      "ice": "001994832000078",
+      "phone": "+212 523-349000"
+    },
+    {
+      "id": "tier-agri-chems",
+      "stationId": "station-winxo-sidi-ismail",
+      "name": "AGRI-CHEMS SARL",
+      "type": "Client",
+      "solde": 8900,
+      "encoursAutorise": 25000,
+      "ice": "002874112000015",
+      "phone": "+212 523-358000"
+    },
+    {
+      "id": "tier-bq-1792249316995",
+      "stationId": "station-1792249316994",
+      "name": "BANQUE",
+      "type": "Banque",
+      "solde": 0,
+      "encoursAutorise": 500000
+    },
+    {
+      "id": "tier-cs-1792249316995",
+      "stationId": "station-1792249316994",
+      "name": "CAISSE ESPECES",
+      "type": "Caisse",
+      "solde": 0,
+      "encoursAutorise": 100000
+    },
+    {
+      "id": "tier-cl-anon-1792249316995",
+      "stationId": "station-1792249316994",
+      "name": "C SANS NOM",
+      "type": "Client",
+      "solde": 0,
+      "encoursAutorise": 0
+    },
+    {
+      "id": "tier-fr-anon-1792249316995",
+      "stationId": "station-1792249316994",
+      "name": "F SANS NOM",
+      "type": "Fournisseur",
+      "solde": 0,
+      "encoursAutorise": 0
+    },
+    {
+      "id": "tier-bq-1792253724741",
+      "stationId": "station-1792253724740",
+      "name": "BANQUE",
+      "type": "Banque",
+      "solde": 0,
+      "encoursAutorise": 500000
+    },
+    {
+      "id": "tier-cs-1792253724741",
+      "stationId": "station-1792253724740",
+      "name": "CAISSE ESPECES",
+      "type": "Caisse",
+      "solde": 0,
+      "encoursAutorise": 100000
+    },
+    {
+      "id": "tier-cl-anon-1792253724741",
+      "stationId": "station-1792253724740",
+      "name": "C SANS NOM",
+      "type": "Client",
+      "solde": 0,
+      "encoursAutorise": 5000,
+      "ice": ""
+    },
+    {
+      "id": "tier-fr-anon-1792253724741",
+      "stationId": "station-1792253724740",
+      "name": "F SANS NOM",
+      "type": "Fournisseur",
+      "solde": 0,
+      "encoursAutorise": 0
+    },
+    {
+      "id": "tier-fr-brand-1792253724741",
+      "stationId": "station-1792253724740",
+      "name": "SHELL",
+      "type": "Fournisseur",
+      "solde": 0,
+      "encoursAutorise": 300000
+    }
+  ],
+  "paiementsTiers": [
+    {
+      "id": "pt-1",
+      "stationId": "station-winxo-sidi-ismail",
+      "tierId": "tier-trans-doukkala",
+      "tierName": "STE TRANSPORT DOUKKALA",
+      "tierType": "Client",
+      "montant": 12000,
+      "date": "2026-10-15",
+      "payePar": "Virement bancaire",
+      "mode": "Virement",
+      "note": "Règlement facture FAC-2026-0012",
+      "createdAt": "2026-10-15T14:30:00Z"
+    },
+    {
+      "id": "pt-2",
+      "stationId": "station-winxo-sidi-ismail",
+      "tierId": "tier-winxo",
+      "tierName": "WINXO",
+      "tierType": "Fournisseur",
+      "montant": 85000,
+      "date": "2026-10-12",
+      "payePar": "Chèque N° 789410",
+      "mode": "Chèque",
+      "note": "Acompte livraison carburants",
+      "createdAt": "2026-10-12T11:00:00Z"
+    },
+    {
+      "id": "pt-1792255829751",
+      "stationId": "station-1792253724740",
+      "tierId": "tier-bq-1792253724741",
+      "tierName": "BANQUE",
+      "tierType": "Banque",
+      "montant": 10000,
+      "date": "2026-10-17",
+      "payePar": "Pompiste / Caissier",
+      "mode": "Virement",
+      "note": "",
+      "createdAt": "2026-10-17T16:50:29.751Z"
+    }
+  ],
+  "produits": [
+    {
+      "id": "prod-1",
+      "stationId": "station-winxo-sidi-ismail",
+      "name": "TOTAL QUARTZ 7000 10W40 (5L)",
+      "category": "Lubrifiants",
+      "marque": "Total",
+      "prixAchatHT": 185,
+      "prixVenteTTC": 260,
+      "stockBoutique": 15,
+      "stockDepot": 45
+    },
+    {
+      "id": "prod-2",
+      "stationId": "station-winxo-sidi-ismail",
+      "name": "WINXO OPTIMA DIESEL 15W40 (5L)",
+      "category": "Lubrifiants",
+      "marque": "Winxo",
+      "prixAchatHT": 145,
+      "prixVenteTTC": 215,
+      "stockBoutique": 20,
+      "stockDepot": 60
+    },
+    {
+      "id": "prod-3",
+      "stationId": "station-winxo-sidi-ismail",
+      "name": "CASTROL MAGNATEC 5W30 (4L)",
+      "category": "Lubrifiants",
+      "marque": "Castrol",
+      "prixAchatHT": 295,
+      "prixVenteTTC": 410,
+      "stockBoutique": 10,
+      "stockDepot": 25
+    },
+    {
+      "id": "prod-4",
+      "stationId": "station-winxo-sidi-ismail",
+      "name": "LIQUIDE REFROIDISSEMENT -25°C (5L)",
+      "category": "Entretien & Fluides",
+      "marque": "Winxo",
+      "prixAchatHT": 35,
+      "prixVenteTTC": 55,
+      "stockBoutique": 25,
+      "stockDepot": 70
+    },
+    {
+      "id": "prod-5",
+      "stationId": "station-winxo-sidi-ismail",
+      "name": "LIQUIDE DE FREIN DOT4 (500ML)",
+      "category": "Entretien & Fluides",
+      "marque": "Bendix",
+      "prixAchatHT": 26,
+      "prixVenteTTC": 45,
+      "stockBoutique": 18,
+      "stockDepot": 35
+    },
+    {
+      "id": "prod-lub1-1792253724741",
+      "stationId": "station-1792253724740",
+      "name": "HUILE MOTEUR 15W40 (5L)",
+      "category": "Lubrifiants",
+      "marque": "Shell",
+      "prixAchatHT": 140,
+      "prixVenteTTC": 210,
+      "stockBoutique": 20,
+      "stockDepot": 50
+    },
+    {
+      "id": "prod-lub2-1792253724741",
+      "stationId": "station-1792253724740",
+      "name": "LIQUIDE DE REFROIDISSEMENT (5L)",
+      "category": "Entretien & Fluides",
+      "marque": "Shell",
+      "prixAchatHT": 35,
+      "prixVenteTTC": 55,
+      "stockBoutique": 25,
+      "stockDepot": 60
+    }
+  ],
+  "services": [
+    {
+      "id": "serv-1",
+      "stationId": "station-winxo-sidi-ismail",
+      "name": "TOTAL SERVICES",
+      "category": "TOTAL LAVAGE",
+      "prixTTC": 10
+    },
+    {
+      "id": "serv-2",
+      "stationId": "station-winxo-sidi-ismail",
+      "name": "TOTAL VIDANGE",
+      "category": "TOTAL VIDANGE",
+      "prixTTC": 15
+    },
+    {
+      "id": "serv-3",
+      "stationId": "station-winxo-sidi-ismail",
+      "name": "LAVAGE COMPLET POIDS LOURD",
+      "category": "TOTAL LAVAGE",
+      "prixTTC": 50
+    },
+    {
+      "id": "serv-4",
+      "stationId": "station-winxo-sidi-ismail",
+      "name": "GRAISSAGE CHÂSSIS",
+      "category": "TOTAL VIDANGE",
+      "prixTTC": 30
+    },
+    {
+      "id": "serv-lav-1792249316995",
+      "stationId": "station-1792249316994",
+      "name": "TOTAL SERVICES",
+      "category": "TOTAL LAVAGE",
+      "prixTTC": 10
+    },
+    {
+      "id": "serv-vid-1792249316995",
+      "stationId": "station-1792249316994",
+      "name": "TOTAL VIDANGE",
+      "category": "TOTAL VIDANGE",
+      "prixTTC": 15
+    },
+    {
+      "id": "serv-lav-1792253724741",
+      "stationId": "station-1792253724740",
+      "name": "TOTAL SERVICES",
+      "category": "TOTAL LAVAGE",
+      "prixTTC": 10
+    },
+    {
+      "id": "serv-vid-1792253724741",
+      "stationId": "station-1792253724740",
+      "name": "TOTAL VIDANGE",
+      "category": "TOTAL VIDANGE",
+      "prixTTC": 15
+    }
+  ],
+  "journees": [
+    {
+      "dateDebut": "2026-10-17",
+      "heureDebut": "00:00",
+      "dateFin": "2026-10-17",
+      "heureFin": "23:59",
+      "responsableId": "sal-ger-1792253724741",
+      "responsableNom": "GERANT",
+      "remarques": "",
+      "avancePompiste": 0,
+      "pistoletEntries": [
+        {
+          "pistoletId": "pist-station-1792253724740-1",
+          "pistoletCode": "P1",
+          "carburantCode": "GAS",
+          "indexEntree": 1000,
+          "indexSortie": 1000,
+          "remiseEnCuve": 0,
+          "quantiteL": 0,
+          "prixUnitaire": 15.92,
+          "totalDH": 0
+        },
+        {
+          "pistoletId": "pist-station-1792253724740-2",
+          "pistoletCode": "P2",
+          "carburantCode": "SSP",
+          "indexEntree": 2000,
+          "indexSortie": 2000,
+          "remiseEnCuve": 0,
+          "quantiteL": 0,
+          "prixUnitaire": 15.62,
+          "totalDH": 0
+        },
+        {
+          "pistoletId": "pist-station-1792253724740-3",
+          "pistoletCode": "P3",
+          "carburantCode": "GAS",
+          "indexEntree": 1000,
+          "indexSortie": 1000,
+          "remiseEnCuve": 0,
+          "quantiteL": 0,
+          "prixUnitaire": 15.92,
+          "totalDH": 0
+        },
+        {
+          "pistoletId": "pist-station-1792253724740-4",
+          "pistoletCode": "P4",
+          "carburantCode": "GAS",
+          "indexEntree": 1000,
+          "indexSortie": 1000,
+          "remiseEnCuve": 0,
+          "quantiteL": 0,
+          "prixUnitaire": 15.92,
+          "totalDH": 0
+        },
+        {
+          "pistoletId": "pist-station-1792253724740-5",
+          "pistoletCode": "P5",
+          "carburantCode": "GAS",
+          "indexEntree": 1000,
+          "indexSortie": 1000,
+          "remiseEnCuve": 0,
+          "quantiteL": 0,
+          "prixUnitaire": 15.92,
+          "totalDH": 0
+        },
+        {
+          "pistoletId": "pist-station-1792253724740-6",
+          "pistoletCode": "P6",
+          "carburantCode": "GAS",
+          "indexEntree": 6000,
+          "indexSortie": 6000,
+          "remiseEnCuve": 0,
+          "quantiteL": 0,
+          "prixUnitaire": 15.92,
+          "totalDH": 0
+        },
+        {
+          "pistoletId": "pist-station-1792253724740-7",
+          "pistoletCode": "P7",
+          "carburantCode": "SSP",
+          "indexEntree": 500,
+          "indexSortie": 500,
+          "remiseEnCuve": 0,
+          "quantiteL": 0,
+          "prixUnitaire": 15.62,
+          "totalDH": 0
+        },
+        {
+          "pistoletId": "pist-station-1792253724740-8",
+          "pistoletCode": "P8",
+          "carburantCode": "GAS",
+          "indexEntree": 1000,
+          "indexSortie": 1000,
+          "remiseEnCuve": 0,
+          "quantiteL": 0,
+          "prixUnitaire": 15.92,
+          "totalDH": 0
+        }
+      ],
+      "produitEntries": [],
+      "serviceEntries": [],
+      "encaissementsNonEspeces": [],
+      "depensesCaisse": [],
+      "reglementsDettes": [],
+      "recharges": [],
+      "totalCarburantsDH": 0,
+      "totalProduitsDH": 0,
+      "totalServicesDH": 0,
+      "totalChiffreAffairesDH": 0,
+      "totalNonEspecesDH": 0,
+      "totalDepensesEspecesDH": 0,
+      "totalReglementsDettesDH": 0,
+      "totalRechargesDH": 0,
+      "especesARemettreDH": 0,
+      "statut": "CLÔTURÉE",
+      "id": "jrn-1792269487574",
+      "stationId": "station-1792253724740",
+      "createdAt": "2026-10-17T20:38:07.574Z"
+    },
+    {
+      "dateDebut": "2026-10-17",
+      "heureDebut": "00:00",
+      "dateFin": "2026-10-17",
+      "heureFin": "23:59",
+      "responsableId": "sal-ger-1792253724741",
+      "responsableNom": "GERANT",
+      "remarques": "",
+      "avancePompiste": 0,
+      "pistoletEntries": [
+        {
+          "pistoletId": "pist-station-1792253724740-1",
+          "pistoletCode": "P1",
+          "carburantCode": "GAS",
+          "indexEntree": 1000,
+          "indexSortie": 1000,
+          "remiseEnCuve": 0,
+          "quantiteL": 0,
+          "prixUnitaire": 15.92,
+          "totalDH": 0
+        },
+        {
+          "pistoletId": "pist-station-1792253724740-2",
+          "pistoletCode": "P2",
+          "carburantCode": "SSP",
+          "indexEntree": 1000,
+          "indexSortie": 1000,
+          "remiseEnCuve": 0,
+          "quantiteL": 0,
+          "prixUnitaire": 15.62,
+          "totalDH": 0
+        },
+        {
+          "pistoletId": "pist-station-1792253724740-3",
+          "pistoletCode": "P3",
+          "carburantCode": "GAS",
+          "indexEntree": 1000,
+          "indexSortie": 1000,
+          "remiseEnCuve": 0,
+          "quantiteL": 0,
+          "prixUnitaire": 15.92,
+          "totalDH": 0
+        },
+        {
+          "pistoletId": "pist-station-1792253724740-4",
+          "pistoletCode": "P4",
+          "carburantCode": "GAS",
+          "indexEntree": 1000,
+          "indexSortie": 1000,
+          "remiseEnCuve": 0,
+          "quantiteL": 0,
+          "prixUnitaire": 15.92,
+          "totalDH": 0
+        },
+        {
+          "pistoletId": "pist-station-1792253724740-5",
+          "pistoletCode": "P5",
+          "carburantCode": "GAS",
+          "indexEntree": 1000,
+          "indexSortie": 1000,
+          "remiseEnCuve": 0,
+          "quantiteL": 0,
+          "prixUnitaire": 15.92,
+          "totalDH": 0
+        },
+        {
+          "pistoletId": "pist-station-1792253724740-6",
+          "pistoletCode": "P6",
+          "carburantCode": "GAS",
+          "indexEntree": 6000,
+          "indexSortie": 6000,
+          "remiseEnCuve": 0,
+          "quantiteL": 0,
+          "prixUnitaire": 15.92,
+          "totalDH": 0
+        },
+        {
+          "pistoletId": "pist-station-1792253724740-7",
+          "pistoletCode": "P7",
+          "carburantCode": "SSP",
+          "indexEntree": 500,
+          "indexSortie": 500,
+          "remiseEnCuve": 0,
+          "quantiteL": 0,
+          "prixUnitaire": 15.62,
+          "totalDH": 0
+        },
+        {
+          "pistoletId": "pist-station-1792253724740-8",
+          "pistoletCode": "P8",
+          "carburantCode": "GAS",
+          "indexEntree": 1000,
+          "indexSortie": 1000,
+          "remiseEnCuve": 0,
+          "quantiteL": 0,
+          "prixUnitaire": 15.92,
+          "totalDH": 0
+        }
+      ],
+      "produitEntries": [],
+      "serviceEntries": [],
+      "encaissementsNonEspeces": [],
+      "depensesCaisse": [],
+      "reglementsDettes": [
+        {
+          "id": "rd-1792266169552",
+          "clientId": "tier-cl-anon-1792253724741",
+          "clientNom": "C SANS NOM",
+          "soldeActuel": 0,
+          "montant": 0,
+          "modePaiement": "Espèces",
+          "note": ""
+        }
+      ],
+      "recharges": [],
+      "totalCarburantsDH": 0,
+      "totalProduitsDH": 0,
+      "totalServicesDH": 0,
+      "totalChiffreAffairesDH": 0,
+      "totalNonEspecesDH": 0,
+      "totalDepensesEspecesDH": 0,
+      "totalReglementsDettesDH": 0,
+      "totalRechargesDH": 0,
+      "especesARemettreDH": 0,
+      "statut": "CLÔTURÉE",
+      "id": "jrn-1792266178813",
+      "stationId": "station-1792253724740",
+      "createdAt": "2026-10-17T19:42:58.813Z"
+    },
+    {
+      "dateDebut": "2026-10-17",
+      "heureDebut": "00:00",
+      "dateFin": "2026-10-17",
+      "heureFin": "23:59",
+      "responsableId": "sal-ger-1792253724741",
+      "responsableNom": "GERANT",
+      "remarques": "",
+      "avancePompiste": 0,
+      "pistoletEntries": [
+        {
+          "pistoletId": "pist-station-1792253724740-1",
+          "pistoletCode": "P1",
+          "carburantCode": "GAS",
+          "indexEntree": 1000,
+          "indexSortie": 1000,
+          "remiseEnCuve": 0,
+          "quantiteL": 0,
+          "prixUnitaire": 15.92,
+          "totalDH": 0
+        },
+        {
+          "pistoletId": "pist-station-1792253724740-2",
+          "pistoletCode": "P2",
+          "carburantCode": "SSP",
+          "indexEntree": 1000,
+          "indexSortie": 1000,
+          "remiseEnCuve": 0,
+          "quantiteL": 0,
+          "prixUnitaire": 15.62,
+          "totalDH": 0
+        },
+        {
+          "pistoletId": "pist-station-1792253724740-3",
+          "pistoletCode": "P3",
+          "carburantCode": "GAS",
+          "indexEntree": 1000,
+          "indexSortie": 1000,
+          "remiseEnCuve": 0,
+          "quantiteL": 0,
+          "prixUnitaire": 15.92,
+          "totalDH": 0
+        },
+        {
+          "pistoletId": "pist-station-1792253724740-4",
+          "pistoletCode": "P4",
+          "carburantCode": "GAS",
+          "indexEntree": 1000,
+          "indexSortie": 1000,
+          "remiseEnCuve": 0,
+          "quantiteL": 0,
+          "prixUnitaire": 15.92,
+          "totalDH": 0
+        },
+        {
+          "pistoletId": "pist-station-1792253724740-5",
+          "pistoletCode": "P5",
+          "carburantCode": "GAS",
+          "indexEntree": 1000,
+          "indexSortie": 1000,
+          "remiseEnCuve": 0,
+          "quantiteL": 0,
+          "prixUnitaire": 15.92,
+          "totalDH": 0
+        },
+        {
+          "pistoletId": "pist-station-1792253724740-6",
+          "pistoletCode": "P6",
+          "carburantCode": "GAS",
+          "indexEntree": 5000,
+          "indexSortie": 5000,
+          "remiseEnCuve": 0,
+          "quantiteL": 0,
+          "prixUnitaire": 15.92,
+          "totalDH": 0
+        },
+        {
+          "pistoletId": "pist-station-1792253724740-7",
+          "pistoletCode": "P7",
+          "carburantCode": "SSP",
+          "indexEntree": 1000,
+          "indexSortie": 1000,
+          "remiseEnCuve": 0,
+          "quantiteL": 0,
+          "prixUnitaire": 15.62,
+          "totalDH": 0
+        },
+        {
+          "pistoletId": "pist-station-1792253724740-8",
+          "pistoletCode": "P8",
+          "carburantCode": "GAS",
+          "indexEntree": 1000,
+          "indexSortie": 1000,
+          "remiseEnCuve": 0,
+          "quantiteL": 0,
+          "prixUnitaire": 15.92,
+          "totalDH": 0
+        }
+      ],
+      "produitEntries": [],
+      "serviceEntries": [],
+      "encaissementsNonEspeces": [],
+      "depensesCaisse": [
+        {
+          "id": "dc-1792256032186",
+          "typeDepense": "Fournitures",
+          "description": "",
+          "montant": 145545,
+          "modePaiement": "Espèces",
+          "notes": ""
+        }
+      ],
+      "reglementsDettes": [],
+      "recharges": [],
+      "totalCarburantsDH": 0,
+      "totalProduitsDH": 0,
+      "totalServicesDH": 0,
+      "totalChiffreAffairesDH": 0,
+      "totalNonEspecesDH": 0,
+      "totalDepensesEspecesDH": 145545,
+      "totalReglementsDettesDH": 0,
+      "totalRechargesDH": 0,
+      "especesARemettreDH": 0,
+      "statut": "CLÔTURÉE",
+      "id": "jrn-1792256038634",
+      "stationId": "station-1792253724740",
+      "createdAt": "2026-10-17T16:53:58.634Z"
+    },
+    {
+      "dateDebut": "2026-10-17",
+      "heureDebut": "00:00",
+      "dateFin": "2026-10-17",
+      "heureFin": "23:59",
+      "responsableId": "sal-ger-1792253724741",
+      "responsableNom": "GERANT",
+      "remarques": "",
+      "avancePompiste": 0,
+      "pistoletEntries": [
+        {
+          "pistoletId": "pist-station-1792253724740-1",
+          "pistoletCode": "P1",
+          "carburantCode": "GAS",
+          "indexEntree": 1000,
+          "indexSortie": 1000,
+          "remiseEnCuve": 0,
+          "quantiteL": 0,
+          "prixUnitaire": 15.92,
+          "totalDH": 0
+        },
+        {
+          "pistoletId": "pist-station-1792253724740-2",
+          "pistoletCode": "P2",
+          "carburantCode": "SSP",
+          "indexEntree": 1000,
+          "indexSortie": 1000,
+          "remiseEnCuve": 0,
+          "quantiteL": 0,
+          "prixUnitaire": 15.62,
+          "totalDH": 0
+        },
+        {
+          "pistoletId": "pist-station-1792253724740-3",
+          "pistoletCode": "P3",
+          "carburantCode": "GAS",
+          "indexEntree": 1000,
+          "indexSortie": 1000,
+          "remiseEnCuve": 0,
+          "quantiteL": 0,
+          "prixUnitaire": 15.92,
+          "totalDH": 0
+        },
+        {
+          "pistoletId": "pist-station-1792253724740-4",
+          "pistoletCode": "P4",
+          "carburantCode": "GAS",
+          "indexEntree": 1000,
+          "indexSortie": 1000,
+          "remiseEnCuve": 0,
+          "quantiteL": 0,
+          "prixUnitaire": 15.92,
+          "totalDH": 0
+        },
+        {
+          "pistoletId": "pist-station-1792253724740-5",
+          "pistoletCode": "P5",
+          "carburantCode": "GAS",
+          "indexEntree": 1000,
+          "indexSortie": 1000,
+          "remiseEnCuve": 0,
+          "quantiteL": 0,
+          "prixUnitaire": 15.92,
+          "totalDH": 0
+        },
+        {
+          "pistoletId": "pist-station-1792253724740-6",
+          "pistoletCode": "P6",
+          "carburantCode": "GAS",
+          "indexEntree": 5000,
+          "indexSortie": 5000,
+          "remiseEnCuve": 0,
+          "quantiteL": 0,
+          "prixUnitaire": 15.92,
+          "totalDH": 0
+        },
+        {
+          "pistoletId": "pist-station-1792253724740-7",
+          "pistoletCode": "P7",
+          "carburantCode": "SSP",
+          "indexEntree": 1000,
+          "indexSortie": 1000,
+          "remiseEnCuve": 0,
+          "quantiteL": 0,
+          "prixUnitaire": 15.62,
+          "totalDH": 0
+        },
+        {
+          "pistoletId": "pist-station-1792253724740-8",
+          "pistoletCode": "P8",
+          "carburantCode": "GAS",
+          "indexEntree": 1000,
+          "indexSortie": 1000,
+          "remiseEnCuve": 0,
+          "quantiteL": 0,
+          "prixUnitaire": 15.92,
+          "totalDH": 0
+        }
+      ],
+      "produitEntries": [],
+      "serviceEntries": [],
+      "encaissementsNonEspeces": [],
+      "depensesCaisse": [
+        {
+          "id": "dc-1792255914162",
+          "typeDepense": "Fournitures",
+          "description": "hbhb",
+          "montant": 25125,
+          "modePaiement": "Espèces",
+          "notes": ""
+        }
+      ],
+      "reglementsDettes": [],
+      "recharges": [],
+      "totalCarburantsDH": 0,
+      "totalProduitsDH": 0,
+      "totalServicesDH": 0,
+      "totalChiffreAffairesDH": 0,
+      "totalNonEspecesDH": 0,
+      "totalDepensesEspecesDH": 25125,
+      "totalReglementsDettesDH": 0,
+      "totalRechargesDH": 0,
+      "especesARemettreDH": 0,
+      "statut": "CLÔTURÉE",
+      "id": "jrn-1792256003447",
+      "stationId": "station-1792253724740",
+      "createdAt": "2026-10-17T16:53:23.447Z"
+    },
+    {
+      "id": "jrn-2026-10-15",
+      "stationId": "station-winxo-sidi-ismail",
+      "dateDebut": "2026-10-15",
+      "heureDebut": "00:00",
+      "dateFin": "2026-10-15",
+      "heureFin": "23:59",
+      "responsableId": "sal-1",
+      "responsableNom": "GERANT",
+      "remarques": "Journée normale sans incident de piste.",
+      "avancePompiste": 0,
+      "pistoletEntries": [
+        {
+          "pistoletId": "pist-1",
+          "pistoletCode": "P1",
+          "carburantCode": "GAS",
+          "indexEntree": 17850,
+          "indexSortie": 18717,
+          "remiseEnCuve": 0,
+          "quantiteL": 867,
+          "prixUnitaire": 15.92,
+          "totalDH": 13802.64
+        },
+        {
+          "pistoletId": "pist-2",
+          "pistoletCode": "P2",
+          "carburantCode": "SSP",
+          "indexEntree": 13950,
+          "indexSortie": 14470,
+          "remiseEnCuve": 0,
+          "quantiteL": 520,
+          "prixUnitaire": 15.62,
+          "totalDH": 8122.4
+        },
+        {
+          "pistoletId": "pist-3",
+          "pistoletCode": "P3",
+          "carburantCode": "GAS",
+          "indexEntree": 6800,
+          "indexSortie": 7335,
+          "remiseEnCuve": 0,
+          "quantiteL": 535,
+          "prixUnitaire": 15.92,
+          "totalDH": 8517.2
+        },
+        {
+          "pistoletId": "pist-4",
+          "pistoletCode": "P4",
+          "carburantCode": "GAS",
+          "indexEntree": 18900,
+          "indexSortie": 19742,
+          "remiseEnCuve": 0,
+          "quantiteL": 842,
+          "prixUnitaire": 15.92,
+          "totalDH": 13404.64
+        }
+      ],
+      "produitEntries": [
+        {
+          "produitId": "prod-1",
+          "marque": "Total",
+          "nomProduit": "TOTAL QUARTZ 7000 10W40 (5L)",
+          "stockEntree": 17,
+          "stockSortie": 15,
+          "quantiteVendue": 2,
+          "prixUnitaire": 260,
+          "totalDH": 520
+        },
+        {
+          "produitId": "prod-2",
+          "marque": "Winxo",
+          "nomProduit": "WINXO OPTIMA DIESEL 15W40 (5L)",
+          "stockEntree": 23,
+          "stockSortie": 20,
+          "quantiteVendue": 3,
+          "prixUnitaire": 215,
+          "totalDH": 645
+        }
+      ],
+      "serviceEntries": [
+        {
+          "serviceId": "serv-1",
+          "category": "TOTAL LAVAGE",
+          "nomService": "TOTAL SERVICES",
+          "quantite": 14,
+          "prixUnitaire": 10,
+          "totalDH": 140
+        },
+        {
+          "serviceId": "serv-2",
+          "category": "TOTAL VIDANGE",
+          "nomService": "TOTAL VIDANGE",
+          "quantite": 6,
+          "prixUnitaire": 15,
+          "totalDH": 90
+        }
+      ],
+      "encaissementsNonEspeces": [
+        {
+          "id": "ne-1",
+          "clientId": "tier-trans-doukkala",
+          "clientNom": "STE TRANSPORT DOUKKALA",
+          "soldeActuel": 14250,
+          "modePaiement": "Bon client",
+          "montant": 4500,
+          "note": "Bons carburant flotte 4 camions"
+        }
+      ],
+      "depensesCaisse": [
+        {
+          "id": "dc-1",
+          "typeDepense": "Fournitures",
+          "description": "Rouleaux papier caisse TPE & détergent piste",
+          "montant": 180,
+          "modePaiement": "Espèces",
+          "notes": "Payé en espèces par le gérant"
+        }
+      ],
+      "reglementsDettes": [],
+      "recharges": [],
+      "totalCarburantsDH": 43846.88,
+      "totalProduitsDH": 1165,
+      "totalServicesDH": 230,
+      "totalChiffreAffairesDH": 45241.88,
+      "totalNonEspecesDH": 4500,
+      "totalDepensesEspecesDH": 180,
+      "totalReglementsDettesDH": 0,
+      "totalRechargesDH": 0,
+      "especesARemettreDH": 40561.88,
+      "statut": "CLÔTURÉE",
+      "createdAt": "2026-10-15T23:55:00Z"
+    }
+  ],
+  "achats": [
+    {
+      "typeAchat": "Carburants",
+      "numeroFacture": "FAC-63894",
+      "fournisseurId": "tier-fr-anon-1792253724741",
+      "fournisseurNom": "F SANS NOM",
+      "dateFacturation": "2026-10-17",
+      "dateEcheance": "2026-10-17",
+      "details": [
+        {
+          "id": "det-1792256066182",
+          "citerneOuProduitId": "cit-gas-1792253724741",
+          "designation": "CGAS (GAS)",
+          "quantite": 1000,
+          "livre": true,
+          "prixUnitaireHT": 11.2,
+          "tvaTaux": 10,
+          "tvaMontant": 0,
+          "totalTTC": 0
+        }
+      ],
+      "paiements": [
+        {
+          "id": "pay-1",
+          "mode": "Chèque",
+          "montant": 0,
+          "datePaiement": "2026-10-17",
+          "decaisse": false
+        }
+      ],
+      "totalHT": 11200,
+      "totalTVA": 0,
+      "totalTTC": 0,
+      "totalPaye": 0,
+      "resteAPayer": 0,
+      "statutPaiement": "Payé",
+      "statutLivraison": "Livré",
+      "id": "ach-1792256069723",
+      "stationId": "station-1792253724740"
+    },
+    {
+      "id": "ach-1",
+      "stationId": "station-winxo-sidi-ismail",
+      "numeroFacture": "STOCK INITIAL",
+      "typeAchat": "Carburants",
+      "fournisseurId": "tier-f-sans-nom",
+      "fournisseurNom": "F SANS NOM",
+      "dateFacturation": "2026-10-01",
+      "dateEcheance": "2026-10-01",
+      "details": [
+        {
+          "id": "ach-det-1",
+          "citerneOuProduitId": "cit-cgas-1",
+          "designation": "Gasoil - CGAS",
+          "quantite": 1000,
+          "livre": true,
+          "prixUnitaireHT": 0,
+          "tvaTaux": 0,
+          "tvaMontant": 0,
+          "totalTTC": 0
+        },
+        {
+          "id": "ach-det-2",
+          "citerneOuProduitId": "cit-cssp-1",
+          "designation": "SSP - CSSP",
+          "quantite": 1000,
+          "livre": true,
+          "prixUnitaireHT": 0,
+          "tvaTaux": 0,
+          "tvaMontant": 0,
+          "totalTTC": 0
+        }
+      ],
+      "paiements": [],
+      "totalHT": 0,
+      "totalTVA": 0,
+      "totalTTC": 0,
+      "totalPaye": 0,
+      "resteAPayer": 0,
+      "statutPaiement": "Payé",
+      "statutLivraison": "Livré"
+    },
+    {
+      "id": "ach-2",
+      "stationId": "station-winxo-sidi-ismail",
+      "numeroFacture": "WX-FAC-88421",
+      "typeAchat": "Carburants",
+      "fournisseurId": "tier-winxo",
+      "fournisseurNom": "WINXO",
+      "dateFacturation": "2026-10-10",
+      "dateEcheance": "2026-10-30",
+      "details": [
+        {
+          "id": "ach-det-3",
+          "citerneOuProduitId": "cit-cgas-1",
+          "designation": "Gasoil Citerne CGAS (Camion Citerne N° 45)",
+          "quantite": 15000,
+          "livre": true,
+          "prixUnitaireHT": 11.2,
+          "tvaTaux": 10,
+          "tvaMontant": 16800,
+          "totalTTC": 184800
+        },
+        {
+          "id": "ach-det-4",
+          "citerneOuProduitId": "cit-cssp-1",
+          "designation": "SSP Citerne CSSP (Compartiment 2)",
+          "quantite": 8000,
+          "livre": true,
+          "prixUnitaireHT": 11.45,
+          "tvaTaux": 10,
+          "tvaMontant": 9160,
+          "totalTTC": 100760
+        }
+      ],
+      "paiements": [
+        {
+          "id": "pay-ach-1",
+          "mode": "Chèque",
+          "montant": 150000,
+          "datePaiement": "2026-10-10",
+          "numeroCheque": "CHQ-890124",
+          "decaisse": true,
+          "dateDecaissement": "2026-10-12"
+        }
+      ],
+      "totalHT": 259600,
+      "totalTVA": 25960,
+      "totalTTC": 285560,
+      "totalPaye": 150000,
+      "resteAPayer": 135560,
+      "statutPaiement": "Partiel",
+      "statutLivraison": "Livré"
+    }
+  ],
+  "depenses": [
+    {
+      "typeDepense": "Électricité & Eau",
+      "fournisseurId": "tier-bq-1792253724741",
+      "fournisseurNom": "BANQUE",
+      "numeroFacture": "DEP-4911",
+      "dateFacturation": "2026-10-17",
+      "dateEcheance": "2026-10-17",
+      "details": [
+        {
+          "id": "d-1792256314911",
+          "designation": "Facture énergie station",
+          "quantite": 1,
+          "prixUnitaireHT": 1500,
+          "tvaTaux": 14,
+          "tvaMontant": 210,
+          "totalTTC": 1710
+        }
+      ],
+      "remise": 0,
+      "totalHT": 1500,
+      "totalTVA": 210,
+      "totalTTC": 1710,
+      "statutPaiement": "Payé",
+      "modePaiement": "Chèque",
+      "datePaiement": "2026-10-17",
+      "id": "dep-1792256325182",
+      "stationId": "station-1792253724740"
+    },
+    {
+      "typeDepense": "Électricité & Eau",
+      "fournisseurId": "tier-bq-1792253724741",
+      "fournisseurNom": "BANQUE",
+      "numeroFacture": "DEP-9504",
+      "dateFacturation": "2026-10-17",
+      "dateEcheance": "2026-10-17",
+      "details": [
+        {
+          "id": "d-1792256109505",
+          "designation": "Facture énergie station",
+          "quantite": 1,
+          "prixUnitaireHT": 1500,
+          "tvaTaux": 14,
+          "tvaMontant": 210,
+          "totalTTC": 1710
+        }
+      ],
+      "remise": 0,
+      "totalHT": 1500,
+      "totalTVA": 210,
+      "totalTTC": 1710,
+      "statutPaiement": "Payé",
+      "modePaiement": "Chèque",
+      "datePaiement": "2026-10-17",
+      "id": "dep-1792256112218",
+      "stationId": "station-1792253724740"
+    },
+    {
+      "id": "dep-1",
+      "stationId": "station-winxo-sidi-ismail",
+      "numeroFacture": "ONEE-2026-09",
+      "typeDepense": "Électricité & Eau",
+      "fournisseurId": "tier-f-sans-nom",
+      "fournisseurNom": "ONEE BRANCHE ELECTRICITE",
+      "dateFacturation": "2026-10-05",
+      "dateEcheance": "2026-10-25",
+      "details": [
+        {
+          "id": "dd-1",
+          "designation": "Consommation Énergie MT Station Septembre 2026",
+          "quantite": 1,
+          "prixUnitaireHT": 3450,
+          "tvaTaux": 14,
+          "tvaMontant": 483,
+          "totalTTC": 3933
+        }
+      ],
+      "remise": 0,
+      "totalHT": 3450,
+      "totalTVA": 483,
+      "totalTTC": 3933,
+      "statutPaiement": "Payé",
+      "modePaiement": "Virement",
+      "datePaiement": "2026-10-06"
+    },
+    {
+      "id": "dep-2",
+      "stationId": "station-winxo-sidi-ismail",
+      "numeroFacture": "MAINT-0452",
+      "typeDepense": "Entretien & Maintenance",
+      "fournisseurId": "tier-f-sans-nom",
+      "fournisseurNom": "EQUIP-PETROL MAROC",
+      "dateFacturation": "2026-10-08",
+      "dateEcheance": "2026-10-28",
+      "details": [
+        {
+          "id": "dd-2",
+          "designation": "Étalonnage volumétrique pistolets P1 à P8",
+          "quantite": 8,
+          "prixUnitaireHT": 150,
+          "tvaTaux": 20,
+          "tvaMontant": 240,
+          "totalTTC": 1440
+        }
+      ],
+      "remise": 0,
+      "totalHT": 1200,
+      "totalTVA": 240,
+      "totalTTC": 1440,
+      "statutPaiement": "Payé",
+      "modePaiement": "Chèque",
+      "datePaiement": "2026-10-09"
+    }
+  ],
+  "commercialDocs": [
+    {
+      "docType": "FACTURE",
+      "numero": "26/10170001",
+      "clientId": "tier-cl-anon-1792253724741",
+      "clientNom": "C SANS NOM",
+      "clientICE": "",
+      "clientAdresse": "",
+      "dateDocument": "2026-10-17",
+      "dateEcheance": "2026-10-17",
+      "numeroBLAssocie": "",
+      "lignes": [
+        {
+          "id": "l-1792266272048",
+          "designation": "Gasoil (GAS)",
+          "unite": "L",
+          "quantite": 500,
+          "prixUnitaireTTC": 15.92,
+          "tvaTaux": 10,
+          "tvaMontant": 723.64,
+          "totalTTC": 7960
+        }
+      ],
+      "totalHT": 7236.36,
+      "totalTVA": 723.64,
+      "totalTTC": 7960,
+      "statut": "PAYÉE",
+      "modePaiement": "Virement",
+      "notes": "",
+      "id": "doc-1792266274419",
+      "stationId": "station-1792253724740"
+    },
+    {
+      "id": "doc-fac-1",
+      "stationId": "station-winxo-sidi-ismail",
+      "docType": "FACTURE",
+      "numero": "FAC-2026-0038",
+      "clientId": "tier-trans-doukkala",
+      "clientNom": "STE TRANSPORT DOUKKALA",
+      "clientICE": "001994832000078",
+      "clientAdresse": "Zone Industrielle, El Jadida",
+      "dateDocument": "2026-10-14",
+      "dateEcheance": "2026-10-31",
+      "numeroBLAssocie": "BL-2026-0021",
+      "lignes": [
+        {
+          "id": "l-1",
+          "designation": "Gasoil Premium Moteur",
+          "unite": "L",
+          "quantite": 1500,
+          "prixUnitaireTTC": 15.92,
+          "tvaTaux": 10,
+          "tvaMontant": 2170.91,
+          "totalTTC": 23880
+        },
+        {
+          "id": "l-2",
+          "designation": "TOTAL QUARTZ 7000 10W40 (5L)",
+          "unite": "Bidon",
+          "quantite": 4,
+          "prixUnitaireTTC": 260,
+          "tvaTaux": 20,
+          "tvaMontant": 173.33,
+          "totalTTC": 1040
+        }
+      ],
+      "totalHT": 22575.76,
+      "totalTVA": 2344.24,
+      "totalTTC": 24920,
+      "statut": "PAYÉE",
+      "modePaiement": "Virement",
+      "notes": "Règlement effectué sous 15 jours."
+    },
+    {
+      "id": "doc-bl-1",
+      "stationId": "station-winxo-sidi-ismail",
+      "docType": "BON_LIVRAISON",
+      "numero": "BL-2026-0028",
+      "clientId": "tier-agri-chems",
+      "clientNom": "AGRI-CHEMS SARL",
+      "clientICE": "002874112000015",
+      "clientAdresse": "Route de Safi, Sidi Ismail",
+      "dateDocument": "2026-10-16",
+      "lignes": [
+        {
+          "id": "l-3",
+          "designation": "Gasoil Piste 4 (Camion citerne agricole)",
+          "unite": "L",
+          "quantite": 800,
+          "prixUnitaireTTC": 15.92,
+          "tvaTaux": 10,
+          "tvaMontant": 1157.82,
+          "totalTTC": 12736
+        }
+      ],
+      "totalHT": 11578.18,
+      "totalTVA": 1157.82,
+      "totalTTC": 12736,
+      "statut": "LIVRÉ",
+      "notes": "Livré au chauffeur Ahmed avec signature BL."
+    },
+    {
+      "id": "doc-dev-1",
+      "stationId": "station-winxo-sidi-ismail",
+      "docType": "DEVIS",
+      "numero": "DEV-2026-0009",
+      "clientId": "tier-agri-chems",
+      "clientNom": "AGRI-CHEMS SARL",
+      "clientICE": "002874112000015",
+      "clientAdresse": "Route de Safi, Sidi Ismail",
+      "dateDocument": "2026-10-15",
+      "dateEcheance": "2026-11-15",
+      "lignes": [
+        {
+          "id": "l-4",
+          "designation": "Gasoil en vrac citerne",
+          "unite": "L",
+          "quantite": 3000,
+          "prixUnitaireTTC": 15.92,
+          "tvaTaux": 10,
+          "tvaMontant": 4341.82,
+          "totalTTC": 47760
+        },
+        {
+          "id": "l-5",
+          "designation": "WINXO OPTIMA DIESEL 15W40 (5L)",
+          "unite": "Bidon",
+          "quantite": 10,
+          "prixUnitaireTTC": 215,
+          "tvaTaux": 20,
+          "tvaMontant": 358.33,
+          "totalTTC": 2150
+        }
+      ],
+      "totalHT": 45209.85,
+      "totalTVA": 4700.15,
+      "totalTTC": 49910,
+      "statut": "EN_COURS",
+      "notes": "Offre valable 30 jours calendaires."
+    }
+  ],
+  "emails": [
+    {
+      "id": "em-1",
+      "to": "gerant.sidiismail@stationhub.ma",
+      "recipientName": "Rachid Tazi",
+      "role": "GERANT",
+      "stationName": "Station Winxo Sidi Ismail",
+      "subject": "Vos identifiants d'accès StationHub - Station Winxo Sidi Ismail",
+      "bodyText": "Bonjour Rachid Tazi,\n\nVotre compte de Gérant de Station a été créé avec succès pour la Station Winxo Sidi Ismail.\n\nVous trouverez ci-dessous vos paramètres d'accès confidentiels.",
+      "credentials": {
+        "email": "gerant.sidiismail@stationhub.ma",
+        "password": "Gerant@2026!",
+        "loginUrl": "https://stationhub.ma/login"
+      },
+      "sentAt": "2026-01-15T09:05:00Z",
+      "status": "DELIVERED"
+    },
+    {
+      "id": "em-2",
+      "to": "expert.comptable@cabinet-fiduciaire.ma",
+      "recipientName": "Fatima Zahra Benali",
+      "role": "EXPERT_COMPTABLE",
+      "stationName": "Station Winxo Sidi Ismail",
+      "subject": "Accès Expert-Comptable StationHub - Station Winxo Sidi Ismail",
+      "bodyText": "Bonjour Fatima Zahra Benali,\n\nUn accès Expert-Comptable vous a été attribué pour la comptabilité, le rapprochement bancaire et la TVA de la Station Winxo Sidi Ismail.",
+      "credentials": {
+        "email": "expert.comptable@cabinet-fiduciaire.ma",
+        "password": "Compta@2026!",
+        "loginUrl": "https://stationhub.ma/login"
+      },
+      "sentAt": "2026-01-16T10:05:00Z",
+      "status": "DELIVERED"
+    },
+    {
+      "id": "email-pwd-1792249301498",
+      "to": "gerant.oasis@stationhub.ma",
+      "recipientName": "Omar Chraibi (Gérant Oasis)",
+      "role": "GERANT",
+      "stationName": "StationHub Plateforme",
+      "subject": "Modification de votre mot de passe par l'administrateur",
+      "bodyText": "Bonjour Omar Chraibi (Gérant Oasis),\n\nVotre mot de passe d'accès a été modifié par l'administrateur de la plateforme.\n\nNouveau mot de passe : NewPassword@2026",
+      "credentials": {
+        "email": "gerant.oasis@stationhub.ma",
+        "password": "NewPassword@2026",
+        "loginUrl": "http://localhost:3000/login"
+      },
+      "sentAt": "2026-10-17T15:01:41.498Z",
+      "status": "DELIVERED"
+    },
+    {
+      "id": "email-pwd-1792249312293",
+      "to": "gerant.oasis@stationhub.ma",
+      "recipientName": "Omar Chraibi (Gérant Oasis)",
+      "role": "GERANT",
+      "stationName": "StationHub Plateforme",
+      "subject": "Modification de votre mot de passe par l'administrateur",
+      "bodyText": "Bonjour Omar Chraibi (Gérant Oasis),\n\nVotre mot de passe d'accès a été modifié par l'administrateur de la plateforme.\n\nNouveau mot de passe : Oasis@2026!",
+      "credentials": {
+        "email": "gerant.oasis@stationhub.ma",
+        "password": "Oasis@2026!",
+        "loginUrl": "http://localhost:3000/login"
+      },
+      "sentAt": "2026-10-17T15:01:52.293Z",
+      "status": "DELIVERED"
+    },
+    {
+      "id": "email-1792249316995",
+      "to": "mehdi.alami@shell-agdal.ma",
+      "recipientName": "Mehdi Alami",
+      "role": "GERANT",
+      "stationName": "Station Shell Agdal",
+      "subject": "Bienvenue sur StationHub - Confirmation de création de compte (Station Shell Agdal)",
+      "bodyText": "Bonjour Mehdi Alami,\n\nVotre compte de Gérant pour la station \"Station Shell Agdal\" a été créé avec succès.\n\nIdentifiant de connexion : mehdi.alami@shell-agdal.ma\nVotre compte est actif et prêt pour l'exploitation.",
+      "credentials": {
+        "email": "mehdi.alami@shell-agdal.ma",
+        "password": "Agdal@2026!",
+        "loginUrl": "http://localhost:3000/login"
+      },
+      "sentAt": "2026-10-17T15:01:56.995Z",
+      "status": "DELIVERED"
+    },
+    {
+      "id": "email-1792253724741-1",
+      "to": "ntarik@gmail.com",
+      "recipientName": "Nayrouz Tarik",
+      "role": "GERANT",
+      "stationName": "Nayrouz Tarik",
+      "subject": "Vos identifiants d'accès StationHub - Nayrouz Tarik",
+      "bodyText": "Bonjour Nayrouz Tarik,\n\nVotre compte de Gérant de Station a été créé pour la station \"Nayrouz Tarik\".\n\nIdentifiant: ntarik@gmail.com\nMot de passe: $eNJZ3nGDZ\nLien d'accès: http://localhost:3000/login\n\nConservez ces identifiants confidentiellement.",
+      "credentials": {
+        "email": "ntarik@gmail.com",
+        "password": "$eNJZ3nGDZ",
+        "loginUrl": "http://localhost:3000/login"
+      },
+      "sentAt": "2026-10-17T16:15:24.741Z",
+      "status": "DELIVERED"
+    },
+    {
+      "id": "email-1792253724741-2",
+      "to": "ibaddah@gmail.com",
+      "recipientName": "ibrahim baddah ",
+      "role": "EXPERT_COMPTABLE",
+      "stationName": "Nayrouz Tarik",
+      "subject": "Accès Expert-Comptable StationHub - Nayrouz Tarik",
+      "bodyText": "Bonjour ibrahim baddah ,\n\nUn compte Expert-Comptable vous a été attribué pour la gestion comptable et fiscale de la station \"Nayrouz Tarik\".\n\nIdentifiant: ibaddah@gmail.com\nMot de passe: dsbRXPs92$\nLien d'accès: http://localhost:3000/login",
+      "credentials": {
+        "email": "ibaddah@gmail.com",
+        "password": "dsbRXPs92$",
+        "loginUrl": "http://localhost:3000/login"
+      },
+      "sentAt": "2026-10-17T16:15:24.741Z",
+      "status": "DELIVERED"
+    },
+    {
+      "id": "email-pwd-1792259291620",
+      "to": "ibaddah@gmail.com",
+      "recipientName": "ibrahim baddah ",
+      "role": "EXPERT_COMPTABLE",
+      "stationName": "StationHub Plateforme",
+      "subject": "Modification de votre mot de passe par l'administrateur",
+      "bodyText": "Bonjour ibrahim baddah ,\n\nVotre mot de passe d'accès a été modifié par l'administrateur de la plateforme.\n\nNouveau mot de passe : Nayibra@2026",
+      "credentials": {
+        "email": "ibaddah@gmail.com",
+        "password": "Nayibra@2026",
+        "loginUrl": "http://localhost:3000/login"
+      },
+      "sentAt": "2026-10-17T17:48:11.620Z",
+      "status": "DELIVERED"
+    },
+    {
+      "id": "email-pwd-1792261658491",
+      "to": "ntarik@gmail.com",
+      "recipientName": "Nayrouz Tarik",
+      "role": "GERANT",
+      "stationName": "StationHub Plateforme",
+      "subject": "Modification de votre mot de passe par l'administrateur",
+      "bodyText": "Bonjour Nayrouz Tarik,\n\nVotre mot de passe d'accès a été modifié par l'administrateur de la plateforme.\n\nNouveau mot de passe : 3vp2#xCQrJfi",
+      "credentials": {
+        "email": "ntarik@gmail.com",
+        "password": "3vp2#xCQrJfi",
+        "loginUrl": "http://localhost:3000/login"
+      },
+      "sentAt": "2026-10-17T18:27:38.491Z",
+      "status": "DELIVERED"
+    },
+    {
+      "id": "email-pwd-1792274547602",
+      "to": "ntarik@gmail.com",
+      "recipientName": "Nayrouz Tarik",
+      "role": "GERANT",
+      "stationName": "StationHub Plateforme",
+      "subject": "Modification de votre mot de passe par l'administrateur",
+      "bodyText": "Bonjour Nayrouz Tarik,\n\nVotre mot de passe d'accès a été modifié par l'administrateur de la plateforme.\n\nNouveau mot de passe : Nayibra@2026",
+      "credentials": {
+        "email": "ntarik@gmail.com",
+        "password": "Nayibra@2026",
+        "loginUrl": "http://localhost:3000/login"
+      },
+      "sentAt": "2026-10-17T22:02:27.602Z",
+      "status": "DELIVERED"
+    }
+  ]
+}
