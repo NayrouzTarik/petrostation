@@ -80,21 +80,89 @@ function loadDatabase(): DatabaseSchema {
   return seeded;
 }
 
-let memoryDb: DatabaseSchema = loadDatabase();
+import { supabase } from './supabaseClient.ts';
 
-function persist(): void {
+let memoryDb: DatabaseSchema = loadDatabase();
+let isSyncing = false;
+let syncDebounce: any = null;
+
+export async function syncFromSupabase(): Promise<boolean> {
+  if (typeof window === 'undefined') return false;
+  if (isSyncing) return false;
+  isSyncing = true;
+  try {
+    const { data, error } = await supabase.from('app_state').select('key, data');
+    if (error) {
+      console.warn('[Supabase Sync] Table app_state inaccessible ou non créée:', error.message);
+      return false;
+    }
+    if (data && data.length > 0) {
+      data.forEach((row: { key: string; data: any }) => {
+        if (row.key in memoryDb) {
+          (memoryDb as any)[row.key] = row.data;
+        }
+      });
+      fixLogoUrls(memoryDb);
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(memoryDb));
+      } catch (e) {
+        // ignore storage error
+      }
+      return true;
+    }
+  } catch (err) {
+    console.warn('[Supabase Sync] Erreur lors de la synchronisation:', err);
+  } finally {
+    isSyncing = false;
+  }
+  return false;
+}
+
+// Lancer la synchronisation initiale dès le chargement en arrière-plan
+if (typeof window !== 'undefined') {
+  syncFromSupabase().catch(() => {});
+}
+
+function persist(changedKey?: keyof DatabaseSchema): void {
   if (typeof window !== 'undefined') {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(memoryDb));
     } catch (e) {
       console.error('Erreur persistance localStorage', e);
     }
+
+    // Synchronisation en arrière-plan avec Supabase
+    if (syncDebounce) clearTimeout(syncDebounce);
+    syncDebounce = setTimeout(async () => {
+      try {
+        if (changedKey) {
+          await supabase.from('app_state').upsert({
+            key: changedKey,
+            data: memoryDb[changedKey],
+            updated_at: new Date().toISOString(),
+          });
+        } else {
+          const entries = (Object.keys(memoryDb) as (keyof DatabaseSchema)[]).map((k) => ({
+            key: k,
+            data: memoryDb[k],
+            updated_at: new Date().toISOString(),
+          }));
+          await supabase.from('app_state').upsert(entries);
+        }
+      } catch (e) {
+        console.warn('[Supabase Persist] Sauvegarde cloud en attente:', e);
+      }
+    }, 400);
   }
 }
 
 export const clientDb = {
   get(): DatabaseSchema {
     return memoryDb;
+  },
+
+  async sync(): Promise<boolean> {
+    return syncFromSupabase();
   },
 
   reset(): void {
@@ -105,9 +173,18 @@ export const clientDb = {
   // Auth
   async login(email: string, password: string) {
     const cleanEmail = email?.trim().toLowerCase();
-    const user = memoryDb.users.find(
+    let user = memoryDb.users.find(
       (u) => u.email.toLowerCase() === cleanEmail && u.password === password
     );
+
+    // Si non trouvé en cache local, tenter une synchronisation fraîche depuis Supabase
+    if (!user) {
+      await syncFromSupabase();
+      user = memoryDb.users.find(
+        (u) => u.email.toLowerCase() === cleanEmail && u.password === password
+      );
+    }
+
     if (!user) {
       throw new Error('Email ou mot de passe incorrect');
     }
