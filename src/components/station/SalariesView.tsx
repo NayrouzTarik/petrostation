@@ -28,6 +28,7 @@ export const SalariesView: React.FC = () => {
   const [matricule, setMatricule] = useState('');
   const [role, setRole] = useState<'GERANT' | 'POMPISTE' | 'LAVEUR' | 'GRAISSEUR' | 'CAISSIER'>('POMPISTE');
   const [phone, setPhone] = useState('');
+  const [baseSalary, setBaseSalary] = useState('3500');
 
   const loadData = async () => {
     if (!station) return;
@@ -55,11 +56,15 @@ export const SalariesView: React.FC = () => {
         matricule,
         role,
         phone,
+        baseSalary: parseFloat(baseSalary) || 3500,
+        actif: true,
+        dateEmbauche: new Date().toISOString().split('T')[0],
       });
       setIsAddModalOpen(false);
       setName('');
       setMatricule('');
       setPhone('');
+      setBaseSalary('3500');
       await loadData();
     } catch (err) {
       alert('Erreur lors de l\'ajout du salarié');
@@ -75,6 +80,7 @@ export const SalariesView: React.FC = () => {
         matricule,
         role,
         phone,
+        baseSalary: parseFloat(baseSalary) || 3500,
       });
       setEditingSalarie(null);
       await loadData();
@@ -99,6 +105,7 @@ export const SalariesView: React.FC = () => {
     setMatricule(s.matricule);
     setRole(s.role);
     setPhone(s.phone || '');
+    setBaseSalary(String(s.baseSalary || 3500));
   };
 
   return (
@@ -155,6 +162,10 @@ export const SalariesView: React.FC = () => {
                     <span className="text-[10px] text-slate-400 font-mono">
                       Matricule: {sal.matricule}
                     </span>
+                    <div className="flex items-center gap-1.5 font-bold text-emerald-700 text-xs mt-1">
+                      <span>{(sal.baseSalary || 3500).toLocaleString('fr-FR')} DH</span>
+                      <span className="text-[10px] text-slate-400 font-normal">/ mois (Brut)</span>
+                    </div>
                   </div>
                 </div>
 
@@ -263,17 +274,37 @@ export const SalariesView: React.FC = () => {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                  Téléphone (optionnel)
-                </label>
-                <input
-                  type="text"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="+212 6..."
-                  className="w-full text-xs font-mono px-3.5 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white transition-all"
-                />
+              <div className="grid grid-cols-2 gap-3.5">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                    Téléphone (optionnel)
+                  </label>
+                  <input
+                    type="text"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+212 6..."
+                    className="w-full text-xs font-mono px-3.5 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                    Salaire Brut Mensuel (DH) *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      required
+                      min="0"
+                      step="50"
+                      value={baseSalary}
+                      onChange={(e) => setBaseSalary(e.target.value)}
+                      placeholder="Ex: 3500"
+                      className="w-full text-xs font-mono font-bold pr-10 px-3.5 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white transition-all"
+                    />
+                    <span className="absolute right-3 top-2.5 text-xs font-bold text-slate-400">DH</span>
+                  </div>
+                </div>
               </div>
 
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
@@ -363,6 +394,39 @@ export const SalariesView: React.FC = () => {
                     <option value="GRAISSEUR">GRAISSEUR</option>
                     <option value="CAISSIER">CAISSIER</option>
                   </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3.5">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                    Téléphone (optionnel)
+                  </label>
+                  <input
+                    type="text"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+212 6..."
+                    className="w-full text-xs font-mono px-3.5 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                    Salaire Brut Mensuel (DH) *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      required
+                      min="0"
+                      step="50"
+                      value={baseSalary}
+                      onChange={(e) => setBaseSalary(e.target.value)}
+                      placeholder="Ex: 3500"
+                      className="w-full text-xs font-mono font-bold pr-10 px-3.5 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white transition-all"
+                    />
+                    <span className="absolute right-3 top-2.5 text-xs font-bold text-slate-400">DH</span>
+                  </div>
                 </div>
               </div>
 

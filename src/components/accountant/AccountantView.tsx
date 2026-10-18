@@ -346,7 +346,7 @@ export const AccountantView: React.FC = () => {
   }
 
   const payrollRows: SalariePayroll[] = salaries.map((s) => {
-    const brut = Number(s.salary) || 3500;
+    const brut = Number(s.baseSalary) || Number((s as any).salary) || 3500;
     // Plafond CNSS à 6000 DH
     const brutPlafonneCNSS = Math.min(brut, 6000);
 

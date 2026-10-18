@@ -103,6 +103,7 @@ export interface Salarie {
   cin?: string;
   dateEmbauche: string;
   actif: boolean;
+  baseSalary?: number;
 }
 
 export interface Tier {
