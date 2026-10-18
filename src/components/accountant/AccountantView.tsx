@@ -25,6 +25,8 @@ import {
   ChevronDown,
   Clock,
   Sparkles,
+  Edit2,
+  X,
 } from 'lucide-react';
 import { api } from '../../services/api.ts';
 import { useAuth } from '../../context/AuthContext.tsx';
@@ -63,6 +65,127 @@ export const AccountantView: React.FC = () => {
   const [selectedJournal, setSelectedJournal] = useState<'ALL' | 'VT' | 'AC' | 'BQ' | 'CA'>('ALL');
   const [periodFilter, setPeriodFilter] = useState<'ALL' | 'CURRENT_MONTH' | 'CURRENT_QUARTER'>('ALL');
   const [exportSuccessMsg, setExportSuccessMsg] = useState<string | null>(null);
+
+  // Payroll adjustments by accountant
+  const [payrollAdjustments, setPayrollAdjustments] = useState<
+    Record<
+      string,
+      {
+        brut: number;
+        cnssSalariale: number;
+        amoSalariale: number;
+        partPatronaleTotal: number;
+        irRetenu: number;
+        isCustom?: boolean;
+      }
+    >
+  >({});
+
+  // Payroll editing modal
+  const [editingPayroll, setEditingPayroll] = useState<{
+    id: string;
+    nom: string;
+    poste: string;
+    brut: number;
+    cnssSalariale: number;
+    amoSalariale: number;
+    partPatronaleTotal: number;
+    irRetenu: number;
+  } | null>(null);
+
+  const [editFormBrut, setEditFormBrut] = useState<string>('0');
+  const [editFormCnss, setEditFormCnss] = useState<string>('0');
+  const [editFormAmo, setEditFormAmo] = useState<string>('0');
+  const [editFormPatronale, setEditFormPatronale] = useState<string>('0');
+  const [editFormIr, setEditFormIr] = useState<string>('0');
+
+  useEffect(() => {
+    if (station?.id) {
+      try {
+        const saved = localStorage.getItem(`stationhub_payroll_adj_${station.id}`);
+        if (saved) {
+          setPayrollAdjustments(JSON.parse(saved));
+        }
+      } catch (err) {
+        console.error('Failed to parse payroll adjustments from storage', err);
+      }
+    }
+  }, [station?.id]);
+
+  const openEditPayroll = (pr: any) => {
+    setEditingPayroll({
+      id: pr.id,
+      nom: pr.nom,
+      poste: pr.poste,
+      brut: pr.brut,
+      cnssSalariale: pr.cnssSalariale,
+      amoSalariale: pr.amoSalariale,
+      partPatronaleTotal: pr.partPatronaleTotal,
+      irRetenu: pr.irRetenu,
+    });
+    setEditFormBrut(String(pr.brut));
+    setEditFormCnss(String(pr.cnssSalariale));
+    setEditFormAmo(String(pr.amoSalariale));
+    setEditFormPatronale(String(pr.partPatronaleTotal));
+    setEditFormIr(String(pr.irRetenu));
+  };
+
+  const recalculateLegalRates = (brutVal: number) => {
+    const brutPlafonne = Math.min(brutVal, 6000);
+    const cnss = Number((brutPlafonne * 0.0448).toFixed(2));
+    const amo = Number((brutVal * 0.0226).toFixed(2));
+    const patronale = Number((brutPlafonne * 0.1698 + brutVal * 0.0411).toFixed(2));
+    const ir = Number((brutVal > 4000 ? (brutVal - 4000) * 0.1 : 0).toFixed(2));
+    setEditFormCnss(cnss.toString());
+    setEditFormAmo(amo.toString());
+    setEditFormPatronale(patronale.toString());
+    setEditFormIr(ir.toString());
+  };
+
+  const handleSavePayrollAdjustment = async () => {
+    if (!station || !editingPayroll) return;
+    const brut = parseFloat(editFormBrut) || 0;
+    const cnss = parseFloat(editFormCnss) || 0;
+    const amo = parseFloat(editFormAmo) || 0;
+    const patronale = parseFloat(editFormPatronale) || 0;
+    const ir = parseFloat(editFormIr) || 0;
+
+    const newAdjs = {
+      ...payrollAdjustments,
+      [editingPayroll.id]: {
+        brut,
+        cnssSalariale: cnss,
+        amoSalariale: amo,
+        partPatronaleTotal: patronale,
+        irRetenu: ir,
+        isCustom: true,
+      },
+    };
+    setPayrollAdjustments(newAdjs);
+    localStorage.setItem(`stationhub_payroll_adj_${station.id}`, JSON.stringify(newAdjs));
+
+    // Synchronize gross base salary with Salarie record so gérant sees it immediately
+    try {
+      await api.updateSalarie(station.id, editingPayroll.id, {
+        baseSalary: brut,
+      });
+      const updatedSalaries = await api.getSalaries(station.id);
+      setSalaries(updatedSalaries);
+    } catch (e) {
+      console.error('Failed to sync updated salary with employee', e);
+    }
+
+    setEditingPayroll(null);
+  };
+
+  const handleResetPayrollAdjustment = async (salarieId: string) => {
+    if (!station) return;
+    const newAdjs = { ...payrollAdjustments };
+    delete newAdjs[salarieId];
+    setPayrollAdjustments(newAdjs);
+    localStorage.setItem(`stationhub_payroll_adj_${station.id}`, JSON.stringify(newAdjs));
+    setEditingPayroll(null);
+  };
 
   const loadData = async () => {
     if (!station) return;
@@ -340,12 +463,41 @@ export const AccountantView: React.FC = () => {
     amoSalariale: number;
     cnssPatronale: number;
     amoPatronale: number;
+    partPatronaleTotal: number;
     irRetenu: number;
     netPayer: number;
     coutEmployeur: number;
+    isCustom?: boolean;
   }
 
   const payrollRows: SalariePayroll[] = salaries.map((s) => {
+    const adj = payrollAdjustments[s.id];
+    if (adj) {
+      const brut = Number(adj.brut) || 0;
+      const cnssSalariale = Number(adj.cnssSalariale) || 0;
+      const amoSalariale = Number(adj.amoSalariale) || 0;
+      const partPatronaleTotal = Number(adj.partPatronaleTotal) || 0;
+      const irRetenu = Number(adj.irRetenu) || 0;
+      const netPayer = Math.max(0, brut - cnssSalariale - amoSalariale - irRetenu);
+      const coutEmployeur = brut + partPatronaleTotal;
+
+      return {
+        id: s.id,
+        nom: `${s.firstName || ''} ${s.lastName || s.name || 'Salarié'}`.trim(),
+        poste: s.role || 'Pompiste',
+        brut,
+        cnssSalariale: Number(cnssSalariale.toFixed(2)),
+        amoSalariale: Number(amoSalariale.toFixed(2)),
+        cnssPatronale: Number((partPatronaleTotal * 0.8).toFixed(2)),
+        amoPatronale: Number((partPatronaleTotal * 0.2).toFixed(2)),
+        partPatronaleTotal: Number(partPatronaleTotal.toFixed(2)),
+        irRetenu: Number(irRetenu.toFixed(2)),
+        netPayer: Number(netPayer.toFixed(2)),
+        coutEmployeur: Number(coutEmployeur.toFixed(2)),
+        isCustom: true,
+      };
+    }
+
     const brut = Number(s.baseSalary) || Number((s as any).salary) || 3500;
     // Plafond CNSS à 6000 DH
     const brutPlafonneCNSS = Math.min(brut, 6000);
@@ -357,6 +509,7 @@ export const AccountantView: React.FC = () => {
     // Part Patronale
     const cnssPatronale = brutPlafonneCNSS * (0.0898 + 0.064 + 0.016); // 16.98%
     const amoPatronale = brut * 0.0411; // 4.11%
+    const partPatronaleTotal = cnssPatronale + amoPatronale;
 
     // IR estimé
     let ir = 0;
@@ -365,7 +518,7 @@ export const AccountantView: React.FC = () => {
     }
 
     const net = Math.max(0, brut - cnssSalariale - amoSalariale - ir);
-    const cout = brut + cnssPatronale + amoPatronale;
+    const cout = brut + partPatronaleTotal;
 
     return {
       id: s.id,
@@ -376,14 +529,16 @@ export const AccountantView: React.FC = () => {
       amoSalariale: Number(amoSalariale.toFixed(2)),
       cnssPatronale: Number(cnssPatronale.toFixed(2)),
       amoPatronale: Number(amoPatronale.toFixed(2)),
+      partPatronaleTotal: Number(partPatronaleTotal.toFixed(2)),
       irRetenu: Number(ir.toFixed(2)),
       netPayer: Number(net.toFixed(2)),
       coutEmployeur: Number(cout.toFixed(2)),
+      isCustom: false,
     };
   });
 
   const totalSalairesBruts = payrollRows.reduce((acc, r) => acc + r.brut, 0);
-  const totalChargesPatronales = payrollRows.reduce((acc, r) => acc + r.cnssPatronale + r.amoPatronale, 0);
+  const totalChargesPatronales = payrollRows.reduce((acc, r) => acc + r.partPatronaleTotal, 0);
   const totalCotisationsSalariales = payrollRows.reduce((acc, r) => acc + r.cnssSalariale + r.amoSalariale, 0);
   const totalNetAPayer = payrollRows.reduce((acc, r) => acc + r.netPayer, 0);
   const totalMasseSalariale = payrollRows.reduce((acc, r) => acc + r.coutEmployeur, 0);
@@ -718,14 +873,14 @@ export const AccountantView: React.FC = () => {
       const dataSalaires = payrollRows.map((pr) => ({
         Salarié: pr.nom,
         Poste: pr.poste,
-        'Salaire Brut': pr.brut,
+        'Salaire Brut (DH)': pr.brut,
         'CNSS Salariale (4.48%)': pr.cnssSalariale,
         'AMO Salariale (2.26%)': pr.amoSalariale,
-        'CNSS Patronale': pr.cnssPatronale,
-        'AMO Patronale': pr.amoPatronale,
-        'IR Estimé': pr.irRetenu,
-        'Net à Payer': pr.netPayer,
-        'Coût Employeur': pr.coutEmployeur,
+        'Part Patronale Total': pr.partPatronaleTotal,
+        'IR Retenu': pr.irRetenu,
+        'Salaire Net (DH)': pr.netPayer,
+        'Coût Employeur (DH)': pr.coutEmployeur,
+        Statut: pr.isCustom ? 'Ajusté comptable' : 'Standard légal',
       }));
 
       exportToExcel(filename, [
@@ -1370,22 +1525,45 @@ export const AccountantView: React.FC = () => {
                   <th className="py-2.5 px-4 text-right">Part Patronale Total</th>
                   <th className="py-2.5 px-4 text-right">IR Retenu</th>
                   <th className="py-2.5 px-4 text-right font-bold text-emerald-800">Salaire Net (DH)</th>
+                  <th className="py-2.5 px-4 text-center">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 font-mono">
                 {payrollRows.map((pr) => (
-                  <tr key={pr.id} className="hover:bg-slate-50/60">
-                    <td className="py-2.5 px-4 font-sans font-bold text-slate-900">{pr.nom}</td>
+                  <tr key={pr.id} className="hover:bg-slate-50/60 transition-colors">
+                    <td className="py-2.5 px-4 font-sans font-bold text-slate-900">
+                      <div className="flex items-center gap-2">
+                        <span>{pr.nom}</span>
+                        {pr.isCustom && (
+                          <span
+                            className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-800 font-sans border border-amber-200"
+                            title="Cotisations ajustées par l'expert-comptable"
+                          >
+                            Ajusté
+                          </span>
+                        )}
+                      </div>
+                    </td>
                     <td className="py-2.5 px-4 font-sans text-slate-600">{pr.poste}</td>
                     <td className="py-2.5 px-4 text-right font-semibold text-slate-900">{pr.brut.toFixed(2)}</td>
                     <td className="py-2.5 px-4 text-right text-slate-600">{pr.cnssSalariale.toFixed(2)}</td>
                     <td className="py-2.5 px-4 text-right text-slate-600">{pr.amoSalariale.toFixed(2)}</td>
                     <td className="py-2.5 px-4 text-right text-amber-800 font-semibold">
-                      {(pr.cnssPatronale + pr.amoPatronale).toFixed(2)}
+                      {pr.partPatronaleTotal.toFixed(2)}
                     </td>
                     <td className="py-2.5 px-4 text-right text-slate-600">{pr.irRetenu.toFixed(2)}</td>
                     <td className="py-2.5 px-4 text-right font-black text-emerald-700 tabular-nums">
                       {pr.netPayer.toFixed(2)} DH
+                    </td>
+                    <td className="py-2.5 px-4 text-center font-sans">
+                      <button
+                        onClick={() => openEditPayroll(pr)}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-md transition-colors cursor-pointer shadow-2xs"
+                        title="Modifier le brut ou ajuster les cotisations"
+                      >
+                        <Edit2 className="w-3 h-3" />
+                        <span>Ajuster</span>
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -1606,6 +1784,194 @@ export const AccountantView: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* MODAL: AJUSTER LA PAIE & DÉCLARATIONS SOCIALES */}
+      {editingPayroll && (() => {
+        const curBrut = parseFloat(editFormBrut) || 0;
+        const curCnss = parseFloat(editFormCnss) || 0;
+        const curAmo = parseFloat(editFormAmo) || 0;
+        const curPatronale = parseFloat(editFormPatronale) || 0;
+        const curIr = parseFloat(editFormIr) || 0;
+        const curNet = Math.max(0, curBrut - curCnss - curAmo - curIr);
+        const curCout = curBrut + curPatronale;
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
+              {/* Header */}
+              <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">
+                    Ajuster la Paie & Déclarations Sociales
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Salarié : <span className="font-semibold text-slate-800">{editingPayroll.nom}</span> • Poste :{' '}
+                    <span className="font-medium text-slate-700">{editingPayroll.poste}</span>
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setEditingPayroll(null)}
+                  className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-200/60 transition-colors cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Body */}
+              <div className="p-6 space-y-4">
+                {/* 1. Salaire Brut */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-xs font-bold text-slate-800">
+                      Salaire Brut (DH)
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => recalculateLegalRates(curBrut)}
+                      className="text-[11px] font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1 hover:underline cursor-pointer"
+                      title="Recalculer automatiquement les cotisations selon les barèmes légaux marocains"
+                    >
+                      <Sparkles className="w-3 h-3" />
+                      Recalculer cotisations légales
+                    </button>
+                  </div>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={editFormBrut}
+                    onChange={(e) => setEditFormBrut(e.target.value)}
+                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-mono font-bold text-slate-900 bg-white"
+                  />
+                  <span className="text-[10px] text-slate-500 mt-1 block">
+                    Modifiable par le comptable ou le gérant — synchronisé automatiquement avec la fiche salarié.
+                  </span>
+                </div>
+
+                {/* 2. Grid Cotisations & Retenues */}
+                <div className="grid grid-cols-2 gap-3 pt-1">
+                  <div>
+                    <label className="text-xs font-semibold text-slate-700 block mb-1">
+                      CNSS Salariale (4.48%) (DH)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={editFormCnss}
+                      onChange={(e) => setEditFormCnss(e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-mono text-slate-900"
+                    />
+                    <span className="text-[10px] text-slate-400 mt-0.5 block">Plafond 6 000 DH</span>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-slate-700 block mb-1">
+                      AMO Salariale (2.26%) (DH)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={editFormAmo}
+                      onChange={(e) => setEditFormAmo(e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-mono text-slate-900"
+                    />
+                    <span className="text-[10px] text-slate-400 mt-0.5 block">Sans plafond</span>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-slate-700 block mb-1">
+                      Part Patronale Total (DH)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={editFormPatronale}
+                      onChange={(e) => setEditFormPatronale(e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-mono text-amber-900 font-semibold"
+                    />
+                    <span className="text-[10px] text-slate-400 mt-0.5 block">Total CNSS + AMO patronale</span>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-slate-700 block mb-1">
+                      IR Retenu (DH)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={editFormIr}
+                      onChange={(e) => setEditFormIr(e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-mono text-slate-900"
+                    />
+                    <span className="text-[10px] text-slate-400 mt-0.5 block">Impôt sur le Revenu prélevé</span>
+                  </div>
+                </div>
+
+                {/* 3. Automatic Real-Time Net calculation preview */}
+                <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl space-y-2 shadow-2xs">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-xs font-bold text-emerald-950 uppercase tracking-wide block">
+                        Salaire Net (Calcul Automatique)
+                      </span>
+                      <span className="text-[10px] text-emerald-700 block">
+                        Net = Brut - CNSS - AMO - IR
+                      </span>
+                    </div>
+                    <div className="text-2xl font-black text-emerald-700 font-mono tabular-nums">
+                      {curNet.toFixed(2)} DH
+                    </div>
+                  </div>
+
+                  <div className="text-[11px] text-emerald-900 font-mono bg-white/60 p-2 rounded-lg border border-emerald-200/50 flex flex-wrap items-center justify-between gap-1">
+                    <span>
+                      {curBrut.toFixed(2)} - {curCnss.toFixed(2)} - {curAmo.toFixed(2)} - {curIr.toFixed(2)}
+                    </span>
+                    <span className="font-bold text-emerald-800">= {curNet.toFixed(2)} DH</span>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-1 text-[11px] text-slate-600 font-medium">
+                    <span>Coût total entreprise (Brut + Charges Patronales) :</span>
+                    <span className="font-mono font-bold text-slate-900">{curCout.toFixed(2)} DH</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+                <div>
+                  {payrollAdjustments[editingPayroll.id] && (
+                    <button
+                      type="button"
+                      onClick={() => handleResetPayrollAdjustment(editingPayroll.id)}
+                      className="text-xs font-semibold text-rose-600 hover:text-rose-800 hover:underline cursor-pointer"
+                    >
+                      Rétablir barème initial
+                    </button>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setEditingPayroll(null)}
+                    className="px-3.5 py-2 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white border border-slate-300 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
+                  >
+                    Annuler
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSavePayrollAdjustment}
+                    className="px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-xs transition-colors cursor-pointer flex items-center gap-1.5"
+                  >
+                    <Check className="w-3.5 h-3.5" />
+                    Enregistrer l'Ajustement
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 };
