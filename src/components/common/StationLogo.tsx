@@ -56,26 +56,26 @@ export const StationLogo: React.FC<StationLogoProps> = ({
 
   // 1. Resolve custom logo specifically for THIS station
   const currentLogoCandidate = liveLogo !== undefined ? liveLogo : logoUrl;
-  const isResetToDefault = currentLogoCandidate === '';
 
   const scopedLocalLogo =
-    typeof window !== 'undefined' && stationId && !isResetToDefault
+    typeof window !== 'undefined' && stationId
       ? localStorage.getItem(`stationhub_logo_${stationId}`)
       : null;
 
-  const isCustomLogoUrl =
-    Boolean(currentLogoCandidate) &&
-    !isResetToDefault &&
-    (currentLogoCandidate!.startsWith('data:image') ||
-      currentLogoCandidate!.startsWith('blob:') ||
-      currentLogoCandidate!.startsWith('http') ||
-      (!currentLogoCandidate!.includes('station_modern_exterior') && currentLogoCandidate!.trim() !== ''));
+  const isValidCustomLogo = (val?: string | null) =>
+    Boolean(val) &&
+    val !== '' &&
+    (val!.startsWith('data:image') ||
+      val!.startsWith('blob:') ||
+      val!.startsWith('http') ||
+      (!val!.includes('station_modern_exterior') && val!.trim() !== ''));
 
-  const effectiveCustomLogo = isResetToDefault
-    ? null
-    : isCustomLogoUrl
-    ? currentLogoCandidate
-    : scopedLocalLogo;
+  let effectiveCustomLogo: string | null = null;
+  if (isValidCustomLogo(currentLogoCandidate)) {
+    effectiveCustomLogo = currentLogoCandidate!;
+  } else if (isValidCustomLogo(scopedLocalLogo)) {
+    effectiveCustomLogo = scopedLocalLogo!;
+  }
 
   if (effectiveCustomLogo) {
     return (

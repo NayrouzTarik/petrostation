@@ -40,11 +40,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [allStations, setAllStations] = useState<Station[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Initialize from API / Local storage
+  // Initialize from API / Session storage
   useEffect(() => {
     async function init() {
       try {
-        const savedUser = localStorage.getItem('stationhub_user');
+        // Supprimer les résidus obsolètes de localStorage pour éviter toute connexion automatique indésirable à la saisie de l'URL
+        try {
+          localStorage.removeItem('stationhub_user');
+          localStorage.removeItem('stationhub_token');
+        } catch (e) {
+          // ignore
+        }
+
+        // L'authentification est conservée uniquement pour la session d'onglet active (sessionStorage)
+        const savedUser = sessionStorage.getItem('stationhub_user');
         if (savedUser) {
           const parsed: User = JSON.parse(savedUser);
           setUser(parsed);
@@ -61,15 +70,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const availableStations = assigned.length > 0 ? assigned : stations;
             setAllStations(availableStations);
             const currentStation = availableStations.find((s) => s.id === parsed.stationId) || availableStations[0] || null;
+            if (currentStation && typeof window !== 'undefined') {
+              const localLogo = localStorage.getItem(`stationhub_logo_${currentStation.id}`);
+              if (localLogo && (!currentStation.logoUrl || currentStation.logoUrl.includes('station_modern_exterior') || currentStation.logoUrl.trim() === '')) {
+                currentStation.logoUrl = localLogo;
+              }
+            }
             setStation(currentStation);
           } else {
             // GERANT: Strictly isolated to his station only
             const myStation = stations.find((s) => s.id === parsed.stationId) || null;
+            if (myStation && typeof window !== 'undefined') {
+              const localLogo = localStorage.getItem(`stationhub_logo_${myStation.id}`);
+              if (localLogo && (!myStation.logoUrl || myStation.logoUrl.includes('station_modern_exterior') || myStation.logoUrl.trim() === '')) {
+                myStation.logoUrl = localLogo;
+              }
+            }
             setAllStations(myStation ? [myStation] : []);
             setStation(myStation);
           }
         } else {
-          // No auto-login: Unauthenticated visitors stay on login
+          // Unauthenticated visitors stay on login
           setUser(null);
           setStation(null);
           setAllStations([]);
@@ -96,15 +117,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const assigned = stations.filter((s: Station) => s.accountantId === res.user.id || res.user.stationId === s.id);
       const available = assigned.length > 0 ? assigned : stations;
       setAllStations(available);
-      setStation(res.station || available[0] || null);
+      const chosen = res.station || available[0] || null;
+      if (chosen && typeof window !== 'undefined') {
+        const localLogo = localStorage.getItem(`stationhub_logo_${chosen.id}`);
+        if (localLogo && (!chosen.logoUrl || chosen.logoUrl.includes('station_modern_exterior') || chosen.logoUrl.trim() === '')) {
+          chosen.logoUrl = localLogo;
+        }
+      }
+      setStation(chosen);
     } else {
       // Gérant: Strictly restricted to his own station
-      setAllStations(res.station ? [res.station] : []);
-      setStation(res.station);
+      const myStation = stations.find((s: Station) => s.id === res.user.stationId) || res.station;
+      if (myStation && typeof window !== 'undefined') {
+        const localLogo = localStorage.getItem(`stationhub_logo_${myStation.id}`);
+        if (localLogo && (!myStation.logoUrl || myStation.logoUrl.includes('station_modern_exterior') || myStation.logoUrl.trim() === '')) {
+          myStation.logoUrl = localLogo;
+        }
+      }
+      setAllStations(myStation ? [myStation] : []);
+      setStation(myStation);
     }
 
-    localStorage.setItem('stationhub_user', JSON.stringify(res.user));
-    localStorage.setItem('stationhub_token', res.token);
+    sessionStorage.setItem('stationhub_user', JSON.stringify(res.user));
+    sessionStorage.setItem('stationhub_token', res.token);
+    try {
+      localStorage.removeItem('stationhub_user');
+      localStorage.removeItem('stationhub_token');
+    } catch (e) {
+      // ignore
+    }
   };
 
   const signup = async (data: any) => {
@@ -112,16 +153,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(res.user);
     setStation(res.station);
     setAllStations(res.station ? [res.station] : []);
-    localStorage.setItem('stationhub_user', JSON.stringify(res.user));
-    localStorage.setItem('stationhub_token', res.token);
+    sessionStorage.setItem('stationhub_user', JSON.stringify(res.user));
+    sessionStorage.setItem('stationhub_token', res.token);
   };
 
   const logout = () => {
     setUser(null);
     setStation(null);
     setAllStations([]);
-    localStorage.removeItem('stationhub_user');
-    localStorage.removeItem('stationhub_token');
+    sessionStorage.removeItem('stationhub_user');
+    sessionStorage.removeItem('stationhub_token');
+    try {
+      localStorage.removeItem('stationhub_user');
+      localStorage.removeItem('stationhub_token');
+      localStorage.removeItem('stationhub_active_nav');
+    } catch (e) {
+      // ignore
+    }
   };
 
   const switchStation = async (stationId: string) => {
@@ -135,7 +183,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (user && user.role === 'EXPERT_COMPTABLE') {
         const updatedUser = { ...user, stationId };
         setUser(updatedUser);
-        localStorage.setItem('stationhub_user', JSON.stringify(updatedUser));
+        sessionStorage.setItem('stationhub_user', JSON.stringify(updatedUser));
       }
     }
   };
@@ -184,14 +232,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (res.user) {
       setUser((prev) => (prev ? { ...prev, name: res.user.name } : null));
       try {
-        const saved = localStorage.getItem('stationhub_user');
+        const saved = sessionStorage.getItem('stationhub_user');
         if (saved) {
           const parsed = JSON.parse(saved);
           parsed.name = res.user.name;
-          localStorage.setItem('stationhub_user', JSON.stringify(parsed));
+          sessionStorage.setItem('stationhub_user', JSON.stringify(parsed));
         }
       } catch (e) {
-        console.warn('localStorage user save handled safely', e);
+        console.warn('sessionStorage user save handled safely', e);
       }
     }
 

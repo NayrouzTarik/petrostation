@@ -55,29 +55,40 @@ function fixLogoUrls(data: DatabaseSchema): DatabaseSchema {
 }
 
 function loadDatabase(): DatabaseSchema {
+  let db: DatabaseSchema;
   if (typeof window === 'undefined') {
-    return fixLogoUrls(JSON.parse(JSON.stringify(initialDb)));
-  }
-
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (parsed && Array.isArray(parsed.users) && parsed.users.length > 0) {
-        return fixLogoUrls(parsed);
+    db = fixLogoUrls(JSON.parse(JSON.stringify(initialDb)));
+  } else {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && Array.isArray(parsed.users) && parsed.users.length > 0) {
+          db = fixLogoUrls(parsed);
+        } else {
+          db = fixLogoUrls(JSON.parse(JSON.stringify(initialDb)));
+        }
+      } else {
+        db = fixLogoUrls(JSON.parse(JSON.stringify(initialDb)));
       }
+    } catch (e) {
+      console.warn('Erreur lecture localStorage, réinitialisation base par défaut', e);
+      db = fixLogoUrls(JSON.parse(JSON.stringify(initialDb)));
     }
-  } catch (e) {
-    console.warn('Erreur lecture localStorage, réinitialisation base par défaut', e);
   }
 
-  const seeded = fixLogoUrls(JSON.parse(JSON.stringify(initialDb)));
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
-  } catch (e) {
-    console.error('Erreur écriture seed localStorage', e);
+  // Restore any saved station logo from localStorage into memoryDb.stations
+  if (typeof window !== 'undefined' && db.stations) {
+    db.stations = db.stations.map((s) => {
+      const savedLogo = localStorage.getItem(`stationhub_logo_${s.id}`);
+      if (savedLogo && (!s.logoUrl || s.logoUrl.includes('station_modern_exterior') || s.logoUrl.trim() === '')) {
+        return { ...s, logoUrl: savedLogo };
+      }
+      return s;
+    });
   }
-  return seeded;
+
+  return db;
 }
 
 import { supabase } from './supabaseClient.ts';
@@ -85,6 +96,7 @@ import { supabase } from './supabaseClient.ts';
 let memoryDb: DatabaseSchema = loadDatabase();
 let isSyncing = false;
 let syncDebounce: any = null;
+const pendingSyncKeys = new Set<keyof DatabaseSchema>();
 
 export async function syncFromSupabase(): Promise<boolean> {
   if (typeof window === 'undefined') return false;
@@ -98,7 +110,36 @@ export async function syncFromSupabase(): Promise<boolean> {
     }
     if (data && data.length > 0) {
       data.forEach((row: { key: string; data: any }) => {
-        if (row.key in memoryDb) {
+        if (row.key === 'stations' && Array.isArray(row.data)) {
+          // Preserve custom station logo if remote has empty/default but local has a valid custom logo
+          const mergedStations = row.data.map((remoteStation: Station) => {
+            const localStation = memoryDb.stations?.find((s) => s.id === remoteStation.id);
+            const localCustomLogo =
+              typeof window !== 'undefined'
+                ? localStorage.getItem(`stationhub_logo_${remoteStation.id}`)
+                : null;
+
+            const remoteHasCustomLogo =
+              Boolean(remoteStation.logoUrl) &&
+              !remoteStation.logoUrl.includes('station_modern_exterior') &&
+              remoteStation.logoUrl.trim() !== '';
+
+            if (!remoteHasCustomLogo) {
+              if (localCustomLogo && localCustomLogo.trim() !== '') {
+                return { ...remoteStation, logoUrl: localCustomLogo };
+              }
+              if (
+                localStation?.logoUrl &&
+                !localStation.logoUrl.includes('station_modern_exterior') &&
+                localStation.logoUrl.trim() !== ''
+              ) {
+                return { ...remoteStation, logoUrl: localStation.logoUrl };
+              }
+            }
+            return remoteStation;
+          });
+          memoryDb.stations = mergedStations;
+        } else if (row.key in memoryDb) {
           (memoryDb as any)[row.key] = row.data;
         }
       });
@@ -131,18 +172,21 @@ function persist(changedKey?: keyof DatabaseSchema): void {
       console.error('Erreur persistance localStorage', e);
     }
 
-    // Synchronisation en arrière-plan avec Supabase
+    if (changedKey) {
+      pendingSyncKeys.add(changedKey);
+    } else {
+      (Object.keys(memoryDb) as (keyof DatabaseSchema)[]).forEach((k) => pendingSyncKeys.add(k));
+    }
+
+    // Synchronisation en arrière-plan avec Supabase avec agrégation de toutes les clés en attente
     if (syncDebounce) clearTimeout(syncDebounce);
     syncDebounce = setTimeout(async () => {
       try {
-        if (changedKey) {
-          await supabase.from('app_state').upsert({
-            key: changedKey,
-            data: memoryDb[changedKey],
-            updated_at: new Date().toISOString(),
-          });
-        } else {
-          const entries = (Object.keys(memoryDb) as (keyof DatabaseSchema)[]).map((k) => ({
+        const keysToSync = Array.from(pendingSyncKeys);
+        pendingSyncKeys.clear();
+
+        if (keysToSync.length > 0) {
+          const entries = keysToSync.map((k) => ({
             key: k,
             data: memoryDb[k],
             updated_at: new Date().toISOString(),
@@ -152,7 +196,7 @@ function persist(changedKey?: keyof DatabaseSchema): void {
       } catch (e) {
         console.warn('[Supabase Persist] Sauvegarde cloud en attente:', e);
       }
-    }, 400);
+    }, 300);
   }
 }
 
@@ -425,6 +469,18 @@ export const clientDb = {
 
     persist('stations');
     persist('users');
+
+    // Sauvegarde synchrone immédiate dans Supabase pour garantir la persistance distante du logo
+    if (typeof window !== 'undefined') {
+      try {
+        await supabase.from('app_state').upsert([
+          { key: 'stations', data: memoryDb.stations, updated_at: new Date().toISOString() },
+          { key: 'users', data: memoryDb.users, updated_at: new Date().toISOString() },
+        ]);
+      } catch (e) {
+        console.warn('[Supabase Sync Direct] Warning sauvegarde distante:', e);
+      }
+    }
 
     return {
       success: true,

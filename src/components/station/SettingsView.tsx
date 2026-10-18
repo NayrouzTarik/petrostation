@@ -108,9 +108,7 @@ export const SettingsView: React.FC = () => {
       setCompanyName(station.companyName || '');
       setIce(station.ice || '');
       const existingLogo = getInitialLogo();
-      if (existingLogo) {
-        setLogoPreview(existingLogo);
-      }
+      setLogoPreview(existingLogo);
     }
   }, [station]);
 
