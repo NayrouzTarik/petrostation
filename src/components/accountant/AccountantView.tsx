@@ -28,7 +28,7 @@ import {
 } from 'lucide-react';
 import { api } from '../../services/api.ts';
 import { useAuth } from '../../context/AuthContext.tsx';
-import { exportToExcel } from '../../utils/excelExport.ts';
+import { exportToExcel, exportToCsvWithBom } from '../../utils/excelExport.ts';
 import { formatDateDMY } from '../../utils/dateUtils.ts';
 import { Citerne, Carburant, Salarie, Tier, Achat, Depense, Journee } from '../../types/index.ts';
 
@@ -743,35 +743,31 @@ export const AccountantView: React.FC = () => {
     }
   };
 
-  // HANDLER: EXPORT FORMAT FEC (CSV Standard pour Sage, Cegid, EBP)
+  // HANDLER: EXPORT FORMAT FEC (CSV Standard pour Sage, Cegid, EBP avec UTF-8 BOM pour Excel)
   const handleExportFEC_CSV = () => {
     try {
       const header = 'JournalCode;JournalLib;EcritureNum;EcritureDate;CompteNum;CompteLib;PieceRef;EcritureLib;Debit;Credit\n';
-      const rows = filteredAccountingEntries.map((e, idx) => {
-        return [
-          e.journal,
-          e.journal === 'VT' ? 'Ventes' : e.journal === 'AC' ? 'Achats' : e.journal === 'BQ' ? 'Banque' : 'Caisse',
-          idx + 1,
-          e.date.replace(/-/g, ''),
-          e.compte,
-          `"${e.libelleCompte}"`,
-          `"${e.piece}"`,
-          `"${e.libelleEcriture}"`,
-          e.debit.toFixed(2),
-          e.credit.toFixed(2),
-        ].join(';');
-      }).join('\n');
+      const rows = filteredAccountingEntries
+        .map((e, idx) => {
+          return [
+            e.journal,
+            e.journal === 'VT' ? 'Ventes' : e.journal === 'AC' ? 'Achats' : e.journal === 'BQ' ? 'Banque' : 'Caisse',
+            idx + 1,
+            e.date.replace(/-/g, ''),
+            e.compte,
+            `"${(e.libelleCompte || '').replace(/"/g, '""')}"`,
+            `"${(e.piece || '').replace(/"/g, '""')}"`,
+            `"${(e.libelleEcriture || '').replace(/"/g, '""')}"`,
+            e.debit.toFixed(2),
+            e.credit.toFixed(2),
+          ].join(';');
+        })
+        .join('\n');
 
-      const blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.setAttribute('href', url);
-      link.setAttribute('download', `FEC_StationHub_${station?.name.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const filename = `FEC_StationHub_${(station?.name || 'station').replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}`;
+      exportToCsvWithBom(filename, header + rows);
 
-      setExportSuccessMsg('✓ Fichier FEC standard (CSV Sage/Cegid) téléchargé avec succès !');
+      setExportSuccessMsg('✓ Fichier FEC standard (CSV UTF-8 avec accents nets) téléchargé avec succès !');
       setTimeout(() => setExportSuccessMsg(null), 5000);
     } catch (e) {
       console.error('Erreur export FEC', e);
