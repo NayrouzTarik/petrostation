@@ -390,22 +390,57 @@ export const FacturationView: React.FC = () => {
         clientAdresse: doc.clientAdresse,
         dateDocument: today,
         dateEcheance: today,
-        numeroBLAssocie: doc.numero,
+        numeroBLAssocie: doc.docType === 'BON_LIVRAISON' ? doc.numero : undefined,
         lignes: doc.lignes,
         totalHT: doc.totalHT,
         totalTVA: doc.totalTVA,
         totalTTC: doc.totalTTC,
         statut: 'PAYÉE',
         modePaiement: 'Virement',
-        notes: `Facturation établie sur base du document ${doc.numero}`,
+        notes: `Facturation établie sur base du ${
+          doc.docType === 'BON_LIVRAISON' ? 'bon de livraison' : 'devis'
+        } ${doc.numero}`,
       };
 
       await api.addCommercialDoc(station.id, newFacture);
+      setViewingDoc(null);
       alert(`Document converti en Facture avec succès : ${newFacture.numero}`);
       setActiveTab('factures');
       await loadData();
     } catch (err) {
-      alert('Erreur lors de la conversion');
+      alert('Erreur lors de la conversion en facture');
+    }
+  };
+
+  const handleConvertToBL = async (doc: CommercialDoc) => {
+    if (!station) return;
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const newBL: Partial<CommercialDoc> = {
+        docType: 'BON_LIVRAISON',
+        numero: getNextDocNumber('BON_LIVRAISON', today),
+        clientId: doc.clientId,
+        clientNom: doc.clientNom,
+        clientICE: doc.clientICE,
+        clientAdresse: doc.clientAdresse,
+        dateDocument: today,
+        dateEcheance: today,
+        modeLivraison: doc.modeLivraison || 'Livré au site',
+        lignes: doc.lignes,
+        totalHT: doc.totalHT,
+        totalTVA: doc.totalTVA,
+        totalTTC: doc.totalTTC,
+        statut: 'LIVRÉ',
+        notes: `Bon de livraison établi sur base du devis ${doc.numero}`,
+      };
+
+      await api.addCommercialDoc(station.id, newBL);
+      setViewingDoc(null);
+      alert(`Devis converti en Bon de Livraison avec succès : ${newBL.numero}`);
+      setActiveTab('bl');
+      await loadData();
+    } catch (err) {
+      alert('Erreur lors de la conversion en bon de livraison');
     }
   };
 
@@ -636,14 +671,35 @@ export const FacturationView: React.FC = () => {
                         <Printer className="w-3.5 h-3.5" />
                       </button>
 
-                      {/* Convert button for BL or Devis */}
-                      {d.docType !== 'FACTURE' && (
+                      {/* Convert buttons based on document type */}
+                      {d.docType === 'DEVIS' && (
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => handleConvertToBL(d)}
+                            className="px-2 py-0.5 text-[10px] font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded flex items-center gap-1 transition-colors"
+                            title="Transférer ce Devis en Bon de Livraison (BL)"
+                          >
+                            <Truck className="w-3 h-3 text-blue-600" />
+                            <span>Vers BL</span>
+                          </button>
+                          <button
+                            onClick={() => handleConvertToFacture(d)}
+                            className="px-2 py-0.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded flex items-center gap-1 transition-colors"
+                            title="Transférer ce Devis en Facture"
+                          >
+                            <FileText className="w-3 h-3 text-emerald-600" />
+                            <span>Facturer</span>
+                          </button>
+                        </div>
+                      )}
+
+                      {d.docType === 'BON_LIVRAISON' && (
                         <button
                           onClick={() => handleConvertToFacture(d)}
-                          className="px-2 py-0.5 text-[10px] font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded flex items-center gap-1"
-                          title="Convertir en Facture"
+                          className="px-2 py-0.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded flex items-center gap-1 transition-colors"
+                          title="Transférer ce Bon de Livraison en Facture"
                         >
-                          <ArrowRight className="w-3 h-3" />
+                          <FileText className="w-3 h-3 text-emerald-600" />
                           <span>Facturer</span>
                         </button>
                       )}
@@ -670,24 +726,60 @@ export const FacturationView: React.FC = () => {
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-4xl max-h-[92vh] overflow-y-auto force-light">
             {/* Top Bar (Hidden on print) */}
-            <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 print:hidden">
-              <button
-                onClick={() => {
-                  if (!viewingDoc) return;
-                  printDocumentWithCustomName({
-                    type: viewingDoc.docType,
-                    reference: viewingDoc.numero,
-                    partnerOrEntity: viewingDoc.clientNom,
-                    date: viewingDoc.dateDocument,
-                    stationName: station?.name,
-                  });
-                }}
-                className="px-4 py-2 text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-800 rounded-lg flex items-center gap-2 shadow-xs transition-colors"
-                title={`Imprimer / Télécharger ${viewingDoc.docType}`}
-              >
-                <Printer className="w-4 h-4" />
-                <span>Imprimer / Télécharger PDF</span>
-              </button>
+            <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 print:hidden gap-3">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    if (!viewingDoc) return;
+                    printDocumentWithCustomName({
+                      type: viewingDoc.docType,
+                      reference: viewingDoc.numero,
+                      partnerOrEntity: viewingDoc.clientNom,
+                      date: viewingDoc.dateDocument,
+                      stationName: station?.name,
+                    });
+                  }}
+                  className="px-4 py-2 text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-800 rounded-lg flex items-center gap-2 shadow-xs transition-colors"
+                  title={`Imprimer / Télécharger ${viewingDoc.docType}`}
+                >
+                  <Printer className="w-4 h-4" />
+                  <span>Imprimer / Télécharger PDF</span>
+                </button>
+
+                {/* Direct Conversion Actions inside Modal */}
+                {viewingDoc.docType === 'DEVIS' && (
+                  <>
+                    <button
+                      onClick={() => handleConvertToBL(viewingDoc)}
+                      className="px-3.5 py-2 text-xs font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg flex items-center gap-1.5 transition-colors shadow-2xs"
+                      title="Transférer ce Devis en Bon de Livraison (BL)"
+                    >
+                      <Truck className="w-3.5 h-3.5 text-blue-600" />
+                      <span>Transférer en BL</span>
+                    </button>
+                    <button
+                      onClick={() => handleConvertToFacture(viewingDoc)}
+                      className="px-3.5 py-2 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg flex items-center gap-1.5 transition-colors shadow-2xs"
+                      title="Transférer ce Devis en Facture"
+                    >
+                      <FileText className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Transférer en Facture</span>
+                    </button>
+                  </>
+                )}
+
+                {viewingDoc.docType === 'BON_LIVRAISON' && (
+                  <button
+                    onClick={() => handleConvertToFacture(viewingDoc)}
+                    className="px-3.5 py-2 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg flex items-center gap-1.5 transition-colors shadow-2xs"
+                    title="Transférer ce Bon de Livraison en Facture"
+                  >
+                    <FileText className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Transférer en Facture</span>
+                  </button>
+                )}
+              </div>
+
               <button
                 onClick={() => setViewingDoc(null)}
                 className="px-3 py-1.5 text-xs font-semibold bg-slate-200 rounded-lg text-slate-700 hover:bg-slate-300"
