@@ -30,6 +30,7 @@ interface AuthContextType {
     currentPassword?: string;
     newPassword?: string;
   }) => Promise<void>;
+  updateUserProfile: (data: Partial<User>) => Promise<User>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -289,6 +290,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const updateUserProfile = async (data: Partial<User>) => {
+    if (!user) throw new Error('Utilisateur non connecté');
+    const res = await api.updateUser(user.id, data);
+    const updated = res.user || { ...user, ...data };
+    setUser(updated);
+    try {
+      sessionStorage.setItem('stationhub_user', JSON.stringify(updated));
+    } catch (e) {
+      console.warn('sessionStorage user update error', e);
+    }
+    return updated;
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">
@@ -317,6 +331,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         refreshStationData,
         refreshStationsList,
         updateGerantSettings,
+        updateUserProfile,
       }}
     >
       {children}

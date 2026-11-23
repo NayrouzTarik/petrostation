@@ -44,6 +44,7 @@ export const AchatsView: React.FC = () => {
   const [numeroFacture, setNumeroFacture] = useState('');
   const [dateFacturation, setDateFacturation] = useState(new Date().toISOString().split('T')[0]);
   const [dateEcheance, setDateEcheance] = useState(new Date().toISOString().split('T')[0]);
+  const [modeLivraison, setModeLivraison] = useState<'Livré au site' | 'Sur site'>('Livré au site');
   const [details, setDetails] = useState<AchatDetail[]>([]);
   const [paiements, setPaiements] = useState<AchatPaiement[]>([]);
 
@@ -81,6 +82,7 @@ export const AchatsView: React.FC = () => {
     setNumeroFacture(`FAC-${Date.now().toString().slice(-5)}`);
     setDateFacturation(new Date().toISOString().split('T')[0]);
     setDateEcheance(new Date().toISOString().split('T')[0]);
+    setModeLivraison('Livré au site');
 
     if (citernes.length > 0) {
       setDetails([
@@ -243,6 +245,7 @@ export const AchatsView: React.FC = () => {
         fournisseurNom: fourn?.name || 'Fournisseur',
         dateFacturation,
         dateEcheance,
+        modeLivraison,
         details,
         paiements,
         totalHT: Math.round(totalHT * 100) / 100,
@@ -259,9 +262,27 @@ export const AchatsView: React.FC = () => {
         setEditingAchat(null);
       } else {
         await api.addAchat(station.id, payload);
+        // Mise à jour automatique des citernes si carburants
+        if (typeAchat === 'Carburants') {
+          for (const det of details) {
+            if (det.citerneOuProduitId && det.quantite > 0) {
+              const cit = citernes.find((c) => c.id === det.citerneOuProduitId);
+              if (cit) {
+                const newStock = Math.min(cit.capacity, Number(cit.currentStock) + Number(det.quantite));
+                await api.updateCiterne(station.id, cit.id, {
+                  ...cit,
+                  currentStock: newStock,
+                });
+              }
+            }
+          }
+        }
         setIsAddOpen(false);
       }
       await loadData();
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('stationhub_stock_updated'));
+      }
     } catch (err) {
       alert('Erreur lors de l\'enregistrement de l\'achat');
     }
@@ -406,6 +427,15 @@ export const AchatsView: React.FC = () => {
                     <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-700 text-white">
                       Livré
                     </span>
+                    {ach.modeLivraison && (
+                      <span className={`block mt-1 text-[9px] font-bold px-1.5 py-0.5 rounded border ${
+                        ach.modeLivraison === 'Sur site'
+                          ? 'bg-purple-50 text-purple-700 border-purple-200'
+                          : 'bg-blue-50 text-blue-700 border-blue-200'
+                      }`}>
+                        {ach.modeLivraison}
+                      </span>
+                    )}
                   </td>
                   <td className="py-3 px-3">
                     <div className="flex items-center justify-center gap-1">
@@ -424,6 +454,7 @@ export const AchatsView: React.FC = () => {
                           setNumeroFacture(ach.numeroFacture);
                           setDateFacturation(ach.dateFacturation);
                           setDateEcheance(ach.dateEcheance);
+                          setModeLivraison(ach.modeLivraison || 'Livré au site');
                           setDetails(ach.details || []);
                           setPaiements(ach.paiements || []);
                           setIsAddOpen(true);
@@ -524,6 +555,19 @@ export const AchatsView: React.FC = () => {
                   <div className="mt-1 text-xs text-slate-600 font-mono">
                     Date facture : <strong>{formatDateDMY(viewingAchat.dateFacturation)}</strong>
                   </div>
+                  {viewingAchat.modeLivraison && (
+                    <div className="mt-1">
+                      <span
+                        className={`inline-block px-2 py-0.5 text-[10px] font-bold rounded border ${
+                          viewingAchat.modeLivraison === 'Sur site'
+                            ? 'bg-purple-100 text-purple-800 border-purple-300'
+                            : 'bg-blue-100 text-blue-800 border-blue-300'
+                        }`}
+                      >
+                        Mode de livraison : {viewingAchat.modeLivraison}
+                      </span>
+                    </div>
+                  )}
                   <div className="mt-1.5">
                     <span
                       className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-bold border ${
@@ -566,6 +610,20 @@ export const AchatsView: React.FC = () => {
                       <span className="text-slate-500">Statut de réception :</span>
                       <span className="font-semibold text-emerald-700">Réceptionné & Conforme</span>
                     </div>
+                    {viewingAchat.modeLivraison && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-500">Mode de livraison :</span>
+                        <span
+                          className={`font-bold px-2 py-0.5 rounded text-xs border ${
+                            viewingAchat.modeLivraison === 'Sur site'
+                              ? 'bg-purple-100 text-purple-800 border-purple-300'
+                              : 'bg-blue-100 text-blue-800 border-blue-300'
+                          }`}
+                        >
+                          {viewingAchat.modeLivraison}
+                        </span>
+                      </div>
+                    )}
                     <div className="flex justify-between">
                       <span className="text-slate-500">Mode de règlement :</span>
                       <span className="font-semibold">{viewingAchat.paiements?.[0]?.mode || 'Virement / Chèque / Traite'}</span>
@@ -691,7 +749,7 @@ export const AchatsView: React.FC = () => {
                 <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">
                   Informations Générales
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3.5">
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
                       Type d'achat
@@ -741,7 +799,7 @@ export const AchatsView: React.FC = () => {
 
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                      Date de Facturation
+                      Date Facturation
                     </label>
                     <input
                       type="date"
@@ -750,6 +808,20 @@ export const AchatsView: React.FC = () => {
                       onChange={(e) => setDateFacturation(e.target.value)}
                       className="w-full text-xs font-mono px-3.5 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-600 transition-all"
                     />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                      Mode de livraison
+                    </label>
+                    <select
+                      value={modeLivraison}
+                      onChange={(e) => setModeLivraison(e.target.value as any)}
+                      className="w-full text-xs px-3.5 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-600 transition-all font-semibold"
+                    >
+                      <option value="Livré au site">Livré au site</option>
+                      <option value="Sur site">Sur site</option>
+                    </select>
                   </div>
                 </div>
               </div>
@@ -778,8 +850,10 @@ export const AchatsView: React.FC = () => {
                     <table className="w-full text-left text-xs min-w-[700px]">
                       <thead className="bg-slate-50 dark:bg-slate-800/70 border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-bold uppercase text-[11px]">
                         <tr>
-                          <th className="py-2.5 px-3.5">Désignation / Citerne</th>
-                          <th className="py-2.5 px-3.5 text-right">Quantité</th>
+                          <th className="py-2.5 px-3.5">
+                            {typeAchat === 'Carburants' ? 'Citerne de dépôt (Où déposer cette marchandise) *' : 'Désignation'}
+                          </th>
+                          <th className="py-2.5 px-3.5 text-right">Quantité (L / U)</th>
                           <th className="py-2.5 px-3.5 text-right">PU HT (DH)</th>
                           <th className="py-2.5 px-3.5 text-right">TVA (%)</th>
                           <th className="py-2.5 px-3.5 text-right">Total TTC</th>
@@ -789,13 +863,35 @@ export const AchatsView: React.FC = () => {
                       <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                         {details.map((det, idx) => (
                           <tr key={det.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition-colors">
-                            <td className="py-2 px-3.5">
-                              <input
-                                type="text"
-                                value={det.designation}
-                                onChange={(e) => updateDetailRow(idx, 'designation', e.target.value)}
-                                className="w-full px-2.5 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                              />
+                            <td className="py-2 px-3.5 min-w-[240px]">
+                              {typeAchat === 'Carburants' ? (
+                                <select
+                                  value={det.citerneOuProduitId}
+                                  onChange={(e) => {
+                                    const citId = e.target.value;
+                                    const cit = citernes.find((c) => c.id === citId);
+                                    const desig = cit ? `${cit.name} (${cit.carburantCode})` : det.designation;
+                                    updateDetailRow(idx, 'citerneOuProduitId', citId);
+                                    updateDetailRow(idx, 'designation', desig);
+                                  }}
+                                  className="w-full px-2.5 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-medium focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                                  required
+                                >
+                                  <option value="">Sélectionnez la citerne de dépôt...</option>
+                                  {citernes.map((c) => (
+                                    <option key={c.id} value={c.id}>
+                                      {c.name} ({c.carburantCode}) — Stock: {c.currentStock.toLocaleString('fr-FR')} / {c.capacity.toLocaleString('fr-FR')} L
+                                    </option>
+                                  ))}
+                                </select>
+                              ) : (
+                                <input
+                                  type="text"
+                                  value={det.designation}
+                                  onChange={(e) => updateDetailRow(idx, 'designation', e.target.value)}
+                                  className="w-full px-2.5 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                                />
+                              )}
                             </td>
                             <td className="py-2 px-3.5 text-right">
                               <input
@@ -959,9 +1055,10 @@ export const AchatsView: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 text-xs font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 rounded-xl shadow-xs hover:shadow transition-all"
+                  className="px-6 py-2.5 text-xs font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 rounded-xl shadow-xs hover:shadow transition-all flex items-center gap-1.5"
                 >
-                  {editingAchat ? 'Enregistrer les modifications' : 'Valider l\'approvisionnement'}
+                  <CheckCircle className="w-4 h-4" />
+                  <span>{editingAchat ? 'Enregistrer les modifications' : "Valider l'approvisionnement"}</span>
                 </button>
               </div>
             </form>

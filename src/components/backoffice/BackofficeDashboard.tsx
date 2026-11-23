@@ -19,9 +19,11 @@ import {
   RefreshCw,
   Sliders,
   Filter,
+  Edit,
+  Phone,
 } from 'lucide-react';
 import { api } from '../../services/api.ts';
-import { Station, User, EmailNotification } from '../../types/index.ts';
+import { Station, User, EmailNotification, UserRole } from '../../types/index.ts';
 import { StationLogo } from '../common/StationLogo.tsx';
 import { CreateStationModal } from './CreateStationModal.tsx';
 import { useAuth } from '../../context/AuthContext.tsx';
@@ -44,6 +46,15 @@ export const BackofficeDashboard: React.FC = () => {
   const [passwordModalSuccess, setPasswordModalSuccess] = useState<string | null>(null);
   const [passwordModalLoading, setPasswordModalLoading] = useState(false);
   const [copiedKey, setCopiedKey] = useState(false);
+
+  // User edit modal state
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [editFormName, setEditFormName] = useState('');
+  const [editFormEmail, setEditFormEmail] = useState('');
+  const [editFormRole, setEditFormRole] = useState<UserRole>('GERANT');
+  const [editFormPhone, setEditFormPhone] = useState('');
+  const [editFormStatus, setEditFormStatus] = useState<'ACTIF' | 'SUSPENDU'>('ACTIF');
+  const [editUserLoading, setEditUserLoading] = useState(false);
 
   // Status toggle loading state
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
@@ -157,6 +168,38 @@ export const BackofficeDashboard: React.FC = () => {
       navigator.clipboard.writeText(newPasswordValue);
       setCopiedKey(true);
       setTimeout(() => setCopiedKey(false), 2000);
+    }
+  };
+
+  const handleOpenEditUserModal = (targetUser: User) => {
+    setEditingUser(targetUser);
+    setEditFormName(targetUser.name || '');
+    setEditFormEmail(targetUser.email || '');
+    setEditFormRole(targetUser.role || 'GERANT');
+    setEditFormPhone(targetUser.phone || '');
+    setEditFormStatus(targetUser.status || 'ACTIF');
+  };
+
+  const handleSaveUserEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingUser) return;
+    try {
+      setEditUserLoading(true);
+      await api.updateUser(editingUser.id, {
+        name: editFormName.trim(),
+        email: editFormEmail.trim(),
+        role: editFormRole,
+        phone: editFormPhone.trim(),
+        status: editFormStatus,
+      });
+      await loadData();
+      setSuccessToast(`Utilisateur "${editFormName.trim()}" mis à jour avec succès !`);
+      setTimeout(() => setSuccessToast(null), 4000);
+      setEditingUser(null);
+    } catch (err: any) {
+      alert(`Erreur: ${err.message || "Impossible de mettre à jour l'utilisateur"}`);
+    } finally {
+      setEditUserLoading(false);
     }
   };
 
@@ -761,6 +804,16 @@ export const BackofficeDashboard: React.FC = () => {
 
                         <td className="py-3.5 px-4 text-right">
                           <div className="flex items-center justify-end gap-1.5">
+                            {/* Edit User Button */}
+                            <button
+                              onClick={() => handleOpenEditUserModal(u)}
+                              className="px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900 border border-emerald-200 dark:border-emerald-800 rounded-lg transition-colors flex items-center gap-1"
+                              title="Modifier les informations de l'utilisateur"
+                            >
+                              <Edit className="w-3 h-3" />
+                              <span>Modifier</span>
+                            </button>
+
                             {/* Modify Password Button */}
                             <button
                               onClick={() => handleOpenPasswordModal(u)}
@@ -1061,6 +1114,127 @@ export const BackofficeDashboard: React.FC = () => {
                 </div>
               </form>
             )}
+          </div>
+        </div>
+      )}
+      {/* USER EDIT MODAL */}
+      {editingUser && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-lg p-6 space-y-4 animate-in fade-in zoom-in-95 text-slate-900 dark:text-white">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 flex items-center justify-center">
+                  <Edit className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold">
+                    Modifier l'Utilisateur
+                  </h3>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    ID : {editingUser.id}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setEditingUser(null)}
+                className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveUserEdit} className="space-y-3.5 text-xs">
+              <div className="space-y-1">
+                <label className="font-semibold text-slate-700 dark:text-slate-300">
+                  Nom complet *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editFormName}
+                  onChange={(e) => setEditFormName(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                  placeholder="ex: Driss Mansouri"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="font-semibold text-slate-700 dark:text-slate-300">
+                    Email de connexion *
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={editFormEmail}
+                    onChange={(e) => setEditFormEmail(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-600 font-mono"
+                    placeholder="utilisateur@domaine.com"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-semibold text-slate-700 dark:text-slate-300">
+                    Téléphone
+                  </label>
+                  <input
+                    type="tel"
+                    value={editFormPhone}
+                    onChange={(e) => setEditFormPhone(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                    placeholder="+212 6 XX XX XX XX"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="font-semibold text-slate-700 dark:text-slate-300">
+                    Rôle de l'utilisateur *
+                  </label>
+                  <select
+                    value={editFormRole}
+                    onChange={(e) => setEditFormRole(e.target.value as UserRole)}
+                    className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                  >
+                    <option value="SUPER_ADMIN">SUPER_ADMIN (Admin Plateforme)</option>
+                    <option value="GERANT">GERANT (Gérant de Station)</option>
+                    <option value="EXPERT_COMPTABLE">EXPERT_COMPTABLE (Fiduciaire)</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-semibold text-slate-700 dark:text-slate-300">
+                    Statut du compte *
+                  </label>
+                  <select
+                    value={editFormStatus}
+                    onChange={(e) => setEditFormStatus(e.target.value as 'ACTIF' | 'SUSPENDU')}
+                    className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                  >
+                    <option value="ACTIF">ACTIF (Accès autorisé)</option>
+                    <option value="SUSPENDU">SUSPENDU (Accès bloqué)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setEditingUser(null)}
+                  className="px-3.5 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl"
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  disabled={editUserLoading}
+                  className="px-4 py-2 text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl font-bold transition-colors disabled:opacity-50 flex items-center gap-1.5"
+                >
+                  {editUserLoading ? 'Enregistrement...' : 'Enregistrer les modifications'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

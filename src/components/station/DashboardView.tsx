@@ -46,7 +46,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ onNavigateToTab })
       fetchDashboard(station.id, false);
     };
     window.addEventListener('focus', handleFocus);
-    return () => window.removeEventListener('focus', handleFocus);
+    window.addEventListener('stationhub_stock_updated', handleFocus);
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('stationhub_stock_updated', handleFocus);
+    };
   }, [station, fetchDashboard]);
 
   const handleManualRefresh = () => {

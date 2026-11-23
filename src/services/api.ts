@@ -158,6 +158,21 @@ export const api = {
     }
   },
 
+  async updateUser(id: string, data: Partial<User>): Promise<{ success: boolean; user: User }> {
+    if (isStaticOrNoBackend()) return clientDb.updateUser(id, data);
+    try {
+      const res = await fetch(`${BASE_URL}/users/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (res.status === 405 || res.status === 404) return clientDb.updateUser(id, data);
+      return res.json();
+    } catch {
+      return clientDb.updateUser(id, data);
+    }
+  },
+
   async updateGerantProfile(
     id: string,
     data: {

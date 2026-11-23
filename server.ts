@@ -24,7 +24,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 5000;
 
 app.use((_req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -357,6 +357,26 @@ app.get('/api/users', (_req: Request, res: Response) => {
   // Strip plain-text passwords for enterprise privacy & security
   const sanitizedUsers = db.users.map(({ password, ...u }) => u);
   res.json(sanitizedUsers);
+});
+
+// UPDATE USER (NAME, EMAIL, ROLE, PHONE, STATUS)
+app.put('/api/users/:id', (req: Request, res: Response) => {
+  const db = dbStore.get();
+  const user = db.users.find((u) => u.id === req.params.id);
+  if (!user) {
+    return res.status(404).json({ error: 'Utilisateur non trouvé' });
+  }
+
+  const { name, email, role, phone, status } = req.body;
+  if (name !== undefined) user.name = name;
+  if (email !== undefined) user.email = email;
+  if (role !== undefined) user.role = role;
+  if (phone !== undefined) user.phone = phone;
+  if (status !== undefined) user.status = status;
+
+  dbStore.saveData();
+  const { password, ...sanitized } = user;
+  res.json({ success: true, user: sanitized });
 });
 
 // UPDATE USER STATUS (ACTIVATE / DEACTIVATE)
@@ -1659,14 +1679,14 @@ app.post('/api/stations/:id/achats', (req: Request, res: Response) => {
 
   // If fuel delivered, add quantity to tank stock
   achat.details?.forEach((det) => {
-    if (det.livre) {
+    if (det.citerneOuProduitId && det.quantite > 0) {
       const cit = db.citernes.find((c) => c.id === det.citerneOuProduitId);
       if (cit) {
-        cit.currentStock += det.quantite;
+        cit.currentStock = Math.min(cit.capacity, Number(cit.currentStock) + Number(det.quantite));
       }
       const prod = db.produits.find((p) => p.id === det.citerneOuProduitId);
       if (prod) {
-        prod.stockDepot += det.quantite;
+        prod.stockDepot = (Number(prod.stockDepot) || 0) + Number(det.quantite);
       }
     }
   });

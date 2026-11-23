@@ -386,6 +386,14 @@ export const clientDb = {
     return { success: true, newPassword };
   },
 
+  async updateUser(id: string, data: Partial<User>) {
+    const user = memoryDb.users.find((u) => u.id === id);
+    if (!user) throw new Error('Utilisateur non trouvé');
+    Object.assign(user, data);
+    persist();
+    return { success: true, user };
+  },
+
   async updateGerantProfile(
     id: string,
     data: {
@@ -1083,6 +1091,30 @@ export const clientDb = {
   async addAchat(stationId: string, data: any): Promise<Achat> {
     const item: Achat = { ...data, stationId, id: `ach-${Date.now()}` };
     memoryDb.achats.unshift(item);
+
+    // Réapprovisionnement automatique du stock des citernes
+    if (item.typeAchat === 'Carburants' && item.details && item.details.length > 0) {
+      for (const d of item.details) {
+        if (d.citerneOuProduitId && d.quantite > 0) {
+          const citIdx = memoryDb.citernes.findIndex((c) => c.id === d.citerneOuProduitId);
+          if (citIdx !== -1) {
+            const current = Number(memoryDb.citernes[citIdx].currentStock) || 0;
+            const cap = Number(memoryDb.citernes[citIdx].capacity) || 999999;
+            memoryDb.citernes[citIdx].currentStock = Math.min(cap, current + Number(d.quantite));
+          }
+        }
+      }
+    } else if (item.typeAchat === 'Produits' && item.details && item.details.length > 0) {
+      for (const d of item.details) {
+        if (d.citerneOuProduitId && d.quantite > 0) {
+          const prodIdx = memoryDb.produits.findIndex((p) => p.id === d.citerneOuProduitId);
+          if (prodIdx !== -1) {
+            memoryDb.produits[prodIdx].stockBoutique = (Number(memoryDb.produits[prodIdx].stockBoutique) || 0) + Number(d.quantite);
+          }
+        }
+      }
+    }
+
     persist();
     return item;
   },

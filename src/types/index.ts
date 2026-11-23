@@ -287,6 +287,7 @@ export interface Achat {
   fournisseurNom: string;
   dateFacturation: string;
   dateEcheance: string;
+  modeLivraison?: 'Livré au site' | 'Sur site';
   details: AchatDetail[];
   paiements: AchatPaiement[];
   totalHT: number;
@@ -351,6 +352,7 @@ export interface CommercialDoc {
   dateDocument: string;
   dateEcheance?: string;
   numeroBLAssocie?: string;
+  modeLivraison?: 'Livré au site' | 'Sur site';
   lignes: CommercialDocLigne[];
   totalHT: number;
   totalTVA: number;

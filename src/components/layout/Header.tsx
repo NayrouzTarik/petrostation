@@ -8,10 +8,12 @@ import {
   Sun,
   Moon,
   Settings,
+  User as UserIcon,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.tsx';
 import { useTheme } from '../../context/ThemeContext.tsx';
 import { StationLogo } from '../common/StationLogo.tsx';
+import { UserProfileModal } from '../common/UserProfileModal.tsx';
 
 interface HeaderProps {
   onOpenEmailOutbox: () => void;
@@ -27,6 +29,7 @@ export const Header: React.FC<HeaderProps> = ({
   const { user, station, allStations, role, logout, switchStation } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [stationMenuOpen, setStationMenuOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   return (
     <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 flex items-center justify-between gap-4 sticky top-0 z-30 shadow-2xs transition-colors">
@@ -169,13 +172,11 @@ export const Header: React.FC<HeaderProps> = ({
         )}
 
         {/* User Badge & Role Tag */}
-        <div className="flex items-center gap-3 pl-2 border-l border-slate-200 dark:border-slate-800">
-          <div
-            onClick={role === 'GERANT' && onNavigateToSettings ? onNavigateToSettings : undefined}
-            className={`flex flex-col text-right hidden sm:flex ${
-              role === 'GERANT' && onNavigateToSettings ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''
-            }`}
-            title={role === 'GERANT' ? 'Modifier mes paramètres de profil (Nom, Logo, Mot de passe)' : undefined}
+        <div className="flex items-center gap-2 sm:gap-3 pl-2 border-l border-slate-200 dark:border-slate-800">
+          <button
+            onClick={() => setIsProfileModalOpen(true)}
+            className="flex flex-col text-right hidden sm:flex cursor-pointer hover:opacity-85 transition-opacity"
+            title="Consulter et modifier mon profil (Mon Compte)"
           >
             <div className="flex items-center gap-1.5 justify-end">
               <span className="text-xs font-bold text-slate-900 dark:text-white leading-tight">
@@ -200,13 +201,23 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">
               {user?.email}
             </span>
-          </div>
+          </button>
+
+          {/* Mon Compte Button */}
+          <button
+            onClick={() => setIsProfileModalOpen(true)}
+            className="p-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors border border-slate-200 dark:border-slate-800 flex items-center gap-1.5"
+            title="Mon Compte - Profil & Identifiants"
+          >
+            <UserIcon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <span className="text-xs font-semibold hidden lg:inline">Mon Compte</span>
+          </button>
 
           {role === 'GERANT' && onNavigateToSettings && (
             <button
               onClick={onNavigateToSettings}
               className="p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors border border-slate-200 dark:border-slate-800"
-              title="Paramètres du Profil (Nom, Logo, Mot de passe)"
+              title="Paramètres de la Station & Logo"
             >
               <Settings className="w-4 h-4" />
             </button>
@@ -221,6 +232,12 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         </div>
       </div>
+
+      {/* User Personal Profile Modal */}
+      <UserProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+      />
     </header>
   );
 };

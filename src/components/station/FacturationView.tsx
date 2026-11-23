@@ -29,6 +29,7 @@ import { CalculatorModal } from '../common/CalculatorModal.tsx';
 import { generateDocNumber, formatDateDMY, isDateInRange } from '../../utils/dateUtils.ts';
 import { exportToExcel } from '../../utils/excelExport.ts';
 import { printDocumentWithCustomName } from '../../utils/printDocument.ts';
+import { montantEnLettres } from '../../utils/numberToWords.ts';
 
 export const FacturationView: React.FC = () => {
   const { station } = useAuth();
@@ -87,6 +88,7 @@ export const FacturationView: React.FC = () => {
   const [dateDocument, setDateDocument] = useState(new Date().toISOString().split('T')[0]);
   const [dateEcheance, setDateEcheance] = useState(new Date().toISOString().split('T')[0]);
   const [numeroBLAssocie, setNumeroBLAssocie] = useState('');
+  const [modeLivraison, setModeLivraison] = useState<'Livré au site' | 'Sur site'>('Livré au site');
   const [statut, setStatut] = useState<'PAYÉE' | 'À PAYER' | 'LIVRÉ' | 'EN_COURS'>('PAYÉE');
   const [modePaiement, setModePaiement] = useState<'Espèces' | 'Chèque' | 'Virement' | 'Traite'>('Virement');
   const [datePaiement, setDatePaiement] = useState(new Date().toISOString().split('T')[0]);
@@ -166,6 +168,7 @@ export const FacturationView: React.FC = () => {
     setDatePaiement(today);
     setNumero(getNextDocNumber(type, today));
     setNumeroBLAssocie('');
+    setModeLivraison('Livré au site');
     setStatut(type === 'FACTURE' ? 'PAYÉE' : type === 'BON_LIVRAISON' ? 'LIVRÉ' : 'EN_COURS');
     setNotes('');
 
@@ -346,6 +349,7 @@ export const FacturationView: React.FC = () => {
         dateDocument,
         dateEcheance,
         numeroBLAssocie,
+        modeLivraison: docType === 'BON_LIVRAISON' ? modeLivraison : undefined,
         lignes,
         totalHT,
         totalTVA,
@@ -564,6 +568,7 @@ export const FacturationView: React.FC = () => {
               <th className="py-2.5 px-3">Nom Client</th>
               <th className="py-2.5 px-3">Date</th>
               {activeTab === 'factures' && <th className="py-2.5 px-3">Réf BL Associé</th>}
+              {activeTab === 'bl' && <th className="py-2.5 px-3 text-center">Mode Livraison</th>}
               <th className="py-2.5 px-3 text-right">Montant (DH TTC)</th>
               <th className="py-2.5 px-3 text-center">Statut</th>
               <th className="py-2.5 px-3 text-center">Actions</th>
@@ -572,7 +577,7 @@ export const FacturationView: React.FC = () => {
           <tbody className="divide-y divide-slate-100">
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={7} className="py-8 text-center text-slate-400 italic">
+                <td colSpan={8} className="py-8 text-center text-slate-400 italic">
                   Aucun document enregistré dans cet onglet.
                 </td>
               </tr>
@@ -592,6 +597,19 @@ export const FacturationView: React.FC = () => {
                   {activeTab === 'factures' && (
                     <td className="py-3 px-3 font-mono text-slate-500 text-[11px]">
                       {d.numeroBLAssocie || '-'}
+                    </td>
+                  )}
+                  {activeTab === 'bl' && (
+                    <td className="py-3 px-3 text-center">
+                      <span
+                        className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-bold border ${
+                          d.modeLivraison === 'Sur site'
+                            ? 'bg-purple-50 text-purple-700 border-purple-200'
+                            : 'bg-blue-50 text-blue-700 border-blue-200'
+                        }`}
+                      >
+                        {d.modeLivraison || 'Livré au site'}
+                      </span>
                     </td>
                   )}
                   <td className="py-3 px-3 text-right font-mono font-bold text-slate-900 tabular-nums">
@@ -728,6 +746,19 @@ export const FacturationView: React.FC = () => {
                       Réf BL Associé : {viewingDoc.numeroBLAssocie}
                     </span>
                   )}
+                  {viewingDoc.docType === 'BON_LIVRAISON' && (
+                    <div className="mt-1">
+                      <span
+                        className={`inline-block px-2.5 py-0.5 text-[10px] font-extrabold rounded border ${
+                          viewingDoc.modeLivraison === 'Sur site'
+                            ? 'bg-purple-100 text-purple-800 border-purple-300'
+                            : 'bg-blue-100 text-blue-800 border-blue-300'
+                        }`}
+                      >
+                        Mode : {viewingDoc.modeLivraison || 'Livré au site'}
+                      </span>
+                    </div>
+                  )}
                   <div className="mt-1.5">
                     <span className="inline-block px-2.5 py-0.5 text-[10px] font-bold rounded bg-slate-100 text-slate-800 border border-slate-300">
                       STATUT : {viewingDoc.statut.toUpperCase()}
@@ -768,9 +799,15 @@ export const FacturationView: React.FC = () => {
                       <span className="text-slate-500">Mode de règlement :</span>
                       <span className="font-semibold text-slate-900">{viewingDoc.modePaiement || 'Virement / Chèque / Espèces'}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-500">Lieu de livraison :</span>
-                      <span className="font-semibold text-slate-700">Sur piste (Station)</span>
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-500">Mode de livraison :</span>
+                      <span className={`font-bold px-2 py-0.5 rounded text-xs border ${
+                        (viewingDoc.modeLivraison || 'Livré au site') === 'Sur site'
+                          ? 'bg-purple-100 text-purple-800 border-purple-300'
+                          : 'bg-blue-100 text-blue-800 border-blue-300'
+                      }`}>
+                        {viewingDoc.modeLivraison || (viewingDoc.docType === 'BON_LIVRAISON' ? 'Livré au site' : 'Sur piste (Station)')}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -817,12 +854,16 @@ export const FacturationView: React.FC = () => {
               {/* Totals Summary */}
               {viewingDoc.docType !== 'BON_LIVRAISON' && (
                 <div className="flex flex-col sm:flex-row justify-between items-start gap-4 pt-2">
-                  <div className="text-xs text-slate-600 italic bg-slate-50 p-4 rounded-xl border border-slate-200 max-w-md">
-                    <p className="font-semibold text-slate-700 not-italic uppercase text-[10px] tracking-wider mb-1">
+                  <div className="text-xs text-slate-600 italic bg-slate-50 p-4 rounded-xl border border-slate-200 max-w-lg">
+                    <p className="font-semibold text-slate-700 not-italic uppercase text-[10px] tracking-wider mb-1.5 flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
                       Mention Légale
                     </p>
-                    Arrêtée la présente pièce commerciale à la somme totale de :{' '}
-                    <strong className="text-slate-900">{viewingDoc.totalTTC.toFixed(2)} Dirhams TTC</strong>.
+                    Arrêtée la présente {viewingDoc.docType === 'FACTURE' ? 'facture' : 'pièce commerciale'} à la somme de :{' '}
+                    <strong className="text-slate-900 not-italic font-bold">
+                      {montantEnLettres(viewingDoc.totalTTC)}
+                    </strong>{' '}
+                    ({viewingDoc.totalTTC.toFixed(2)} DH TTC).
                   </div>
 
                   <div className="w-full sm:w-80 space-y-2 p-4 bg-slate-50 rounded-xl border border-slate-200 font-mono text-xs">
@@ -1086,6 +1127,26 @@ export const FacturationView: React.FC = () => {
                     </div>
                   )}
                 </div>
+
+                {docType === 'BON_LIVRAISON' && (
+                  <div className="pt-2 border-t border-slate-200">
+                    <label className="block text-xs font-bold text-slate-800 mb-1 flex items-center gap-1.5">
+                      <span>Mode de Livraison *</span>
+                      <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                        Obligatoire pour le Bon de Livraison
+                      </span>
+                    </label>
+                    <select
+                      required
+                      value={modeLivraison}
+                      onChange={(e) => setModeLivraison(e.target.value as 'Livré au site' | 'Sur site')}
+                      className="w-full sm:w-80 text-xs px-3 py-2 border border-slate-300 rounded-lg bg-white font-bold text-slate-800 focus:ring-2 focus:ring-emerald-600 focus:outline-none"
+                    >
+                      <option value="Livré au site">Livré au site (Transporté chez le client)</option>
+                      <option value="Sur site">Sur site (Pris en charge à la station)</option>
+                    </select>
+                  </div>
+                )}
               </div>
 
               {/* Section 2: Articles & Lignes */}

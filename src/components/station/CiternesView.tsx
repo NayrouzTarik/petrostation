@@ -64,6 +64,13 @@ export const CiternesView: React.FC = () => {
 
   useEffect(() => {
     loadData();
+    const handleStockUpdate = () => {
+      loadData();
+    };
+    window.addEventListener('stationhub_stock_updated', handleStockUpdate);
+    return () => {
+      window.removeEventListener('stationhub_stock_updated', handleStockUpdate);
+    };
   }, [station]);
 
   const openEditModal = (c: Citerne) => {

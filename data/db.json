@@ -1001,7 +1001,9 @@
       "matricule": "GER-001",
       "role": "GERANT",
       "dateEmbauche": "2026-10-17",
-      "actif": true
+      "actif": true,
+      "phone": "",
+      "baseSalary": 8000
     },
     {
       "id": "sal-pomp1-1792253724741",
@@ -2236,6 +2238,36 @@
     }
   ],
   "commercialDocs": [
+    {
+      "docType": "BON_LIVRAISON",
+      "numero": "BL-26/11230001",
+      "clientId": "tier-cl-anon-1792253724741",
+      "clientNom": "C SANS NOM",
+      "clientICE": "",
+      "clientAdresse": "",
+      "dateDocument": "2026-11-23",
+      "dateEcheance": "2026-11-23",
+      "numeroBLAssocie": "",
+      "lignes": [
+        {
+          "id": "l-1795461915046",
+          "designation": "Gasoil (GAS)",
+          "unite": "L",
+          "quantite": 500,
+          "prixUnitaireTTC": 15.92,
+          "tvaTaux": 10,
+          "tvaMontant": 723.64,
+          "totalTTC": 7960
+        }
+      ],
+      "totalHT": 7236.36,
+      "totalTVA": 723.64,
+      "totalTTC": 7960,
+      "statut": "LIVRÉ",
+      "notes": "",
+      "id": "doc-1795461916332",
+      "stationId": "station-1792253724740"
+    },
     {
       "docType": "FACTURE",
       "numero": "26/10170001",
