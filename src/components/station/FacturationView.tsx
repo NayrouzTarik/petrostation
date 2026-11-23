@@ -40,6 +40,7 @@ export const FacturationView: React.FC = () => {
   const [produits, setProduits] = useState<Produit[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'PENDING' | 'PROCESSED'>('ALL');
 
   // Custom Logo State (Item 12.1)
   const [customDocLogo, setCustomDocLogo] = useState<string>(
@@ -403,8 +404,18 @@ export const FacturationView: React.FC = () => {
       };
 
       await api.addCommercialDoc(station.id, newFacture);
+
+      // Clôturer le document d'origine avec le statut FACTURÉ
+      const updatedNotes = doc.notes
+        ? `${doc.notes} | Facturé sous N° ${newFacture.numero}`
+        : `Facturé sous N° ${newFacture.numero}`;
+      await api.updateCommercialDoc(station.id, doc.id, {
+        statut: 'FACTURÉ',
+        notes: updatedNotes,
+      });
+
       setViewingDoc(null);
-      alert(`Document converti en Facture avec succès : ${newFacture.numero}`);
+      alert(`Document converti en Facture avec succès : ${newFacture.numero} (Document source marqué FACTURÉ)`);
       setActiveTab('factures');
       await loadData();
     } catch (err) {
@@ -435,8 +446,18 @@ export const FacturationView: React.FC = () => {
       };
 
       await api.addCommercialDoc(station.id, newBL);
+
+      // Archiver le devis d'origine avec le statut TRANSFÉRÉ
+      const updatedNotes = doc.notes
+        ? `${doc.notes} | Transféré en Bon de Livraison N° ${newBL.numero}`
+        : `Transféré en Bon de Livraison N° ${newBL.numero}`;
+      await api.updateCommercialDoc(station.id, doc.id, {
+        statut: 'TRANSFÉRÉ',
+        notes: updatedNotes,
+      });
+
       setViewingDoc(null);
-      alert(`Devis converti en Bon de Livraison avec succès : ${newBL.numero}`);
+      alert(`Devis converti en Bon de Livraison avec succès : ${newBL.numero} (Devis source marqué TRANSFÉRÉ)`);
       setActiveTab('bl');
       await loadData();
     } catch (err) {
@@ -482,11 +503,38 @@ export const FacturationView: React.FC = () => {
     return d.docType === 'DEVIS';
   });
 
-  const filtered = currentDocs.filter(
-    (d) =>
+  const pendingDocsCount = currentDocs.filter((d) => {
+    if (activeTab === 'devis') return d.statut !== 'TRANSFÉRÉ' && d.statut !== 'FACTURÉ';
+    if (activeTab === 'bl') return d.statut !== 'FACTURÉ';
+    return d.statut !== 'PAYÉE';
+  }).length;
+
+  const processedDocsCount = currentDocs.filter((d) => {
+    if (activeTab === 'devis') return d.statut === 'TRANSFÉRÉ' || d.statut === 'FACTURÉ';
+    if (activeTab === 'bl') return d.statut === 'FACTURÉ';
+    return d.statut === 'PAYÉE';
+  }).length;
+
+  const filtered = currentDocs.filter((d) => {
+    const matchesSearch =
       d.numero.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      d.clientNom.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+      d.clientNom.toLowerCase().includes(searchQuery.toLowerCase());
+    if (!matchesSearch) return false;
+
+    if (statusFilter === 'PENDING') {
+      if (activeTab === 'devis') return d.statut !== 'TRANSFÉRÉ' && d.statut !== 'FACTURÉ';
+      if (activeTab === 'bl') return d.statut !== 'FACTURÉ';
+      return d.statut !== 'PAYÉE';
+    }
+
+    if (statusFilter === 'PROCESSED') {
+      if (activeTab === 'devis') return d.statut === 'TRANSFÉRÉ' || d.statut === 'FACTURÉ';
+      if (activeTab === 'bl') return d.statut === 'FACTURÉ';
+      return d.statut === 'PAYÉE';
+    }
+
+    return true;
+  });
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto print:p-0 print:m-0 print:max-w-none">
@@ -495,7 +543,10 @@ export const FacturationView: React.FC = () => {
         {/* 3 Sub-tabs matching PDF Page 12, 13, 14 */}
         <div className="flex items-center gap-6 border-b border-slate-200">
         <button
-          onClick={() => setActiveTab('factures')}
+          onClick={() => {
+            setActiveTab('factures');
+            setStatusFilter('ALL');
+          }}
           className={`pb-3 text-xs font-bold uppercase tracking-wider transition-colors border-b-2 ${
             activeTab === 'factures'
               ? 'border-emerald-700 text-emerald-800'
@@ -505,7 +556,10 @@ export const FacturationView: React.FC = () => {
           1er : Factures
         </button>
         <button
-          onClick={() => setActiveTab('bl')}
+          onClick={() => {
+            setActiveTab('bl');
+            setStatusFilter('ALL');
+          }}
           className={`pb-3 text-xs font-bold uppercase tracking-wider transition-colors border-b-2 ${
             activeTab === 'bl'
               ? 'border-emerald-700 text-emerald-800'
@@ -515,7 +569,10 @@ export const FacturationView: React.FC = () => {
           2eme : Bons de Livraison (BL)
         </button>
         <button
-          onClick={() => setActiveTab('devis')}
+          onClick={() => {
+            setActiveTab('devis');
+            setStatusFilter('ALL');
+          }}
           className={`pb-3 text-xs font-bold uppercase tracking-wider transition-colors border-b-2 ${
             activeTab === 'devis'
               ? 'border-emerald-700 text-emerald-800'
@@ -528,15 +585,65 @@ export const FacturationView: React.FC = () => {
 
       {/* Action Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="relative w-72">
-          <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
-          <input
-            type="text"
-            placeholder="Filtrer par n° ou client..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full text-xs pl-8 pr-3 py-1.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600 bg-white"
-          />
+        <div className="flex flex-wrap items-center gap-2.5">
+          <div className="relative w-64">
+            <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Filtrer par n° ou client..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full text-xs pl-8 pr-3 py-1.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600 bg-white"
+            />
+          </div>
+
+          {/* Quick status filter pills */}
+          <div className="inline-flex items-center p-0.5 bg-slate-100 rounded-lg border border-slate-200 text-[11px] font-semibold">
+            <button
+              onClick={() => setStatusFilter('ALL')}
+              className={`px-2.5 py-1 rounded-md transition-colors ${
+                statusFilter === 'ALL'
+                  ? 'bg-white text-slate-900 shadow-2xs font-bold'
+                  : 'text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              Tous ({currentDocs.length})
+            </button>
+            <button
+              onClick={() => setStatusFilter('PENDING')}
+              className={`px-2.5 py-1 rounded-md transition-colors ${
+                statusFilter === 'PENDING'
+                  ? 'bg-white text-amber-800 shadow-2xs font-bold'
+                  : 'text-slate-500 hover:text-slate-800'
+              }`}
+              title={
+                activeTab === 'devis'
+                  ? 'Devis en cours (non encore transférés)'
+                  : activeTab === 'bl'
+                  ? 'Bons de livraison en attente de facturation'
+                  : 'Factures impayées'
+              }
+            >
+              {activeTab === 'devis' ? 'En cours' : activeTab === 'bl' ? 'À facturer' : 'À payer'} ({pendingDocsCount})
+            </button>
+            <button
+              onClick={() => setStatusFilter('PROCESSED')}
+              className={`px-2.5 py-1 rounded-md transition-colors ${
+                statusFilter === 'PROCESSED'
+                  ? 'bg-white text-emerald-800 shadow-2xs font-bold'
+                  : 'text-slate-500 hover:text-slate-800'
+              }`}
+              title={
+                activeTab === 'devis'
+                  ? 'Devis déjà transférés en BL ou facturés'
+                  : activeTab === 'bl'
+                  ? 'Bons de livraison déjà facturés'
+                  : 'Factures payées'
+              }
+            >
+              {activeTab === 'devis' ? 'Transférés / Facturés' : activeTab === 'bl' ? 'Déjà facturés' : 'Payées'} ({processedDocsCount})
+            </button>
+          </div>
         </div>
 
         <div className="flex items-center gap-2 self-start sm:self-auto">
@@ -655,6 +762,10 @@ export const FacturationView: React.FC = () => {
                       className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
                         d.statut === 'PAYÉE' || d.statut === 'LIVRÉ'
                           ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                          : d.statut === 'FACTURÉ'
+                          ? 'bg-purple-50 text-purple-700 border-purple-200'
+                          : d.statut === 'TRANSFÉRÉ'
+                          ? 'bg-blue-50 text-blue-700 border-blue-200'
                           : 'bg-amber-50 text-amber-800 border-amber-200'
                       }`}
                     >
@@ -673,35 +784,61 @@ export const FacturationView: React.FC = () => {
 
                       {/* Convert buttons based on document type */}
                       {d.docType === 'DEVIS' && (
-                        <div className="flex items-center gap-1">
-                          <button
-                            onClick={() => handleConvertToBL(d)}
-                            className="px-2 py-0.5 text-[10px] font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded flex items-center gap-1 transition-colors"
-                            title="Transférer ce Devis en Bon de Livraison (BL)"
-                          >
-                            <Truck className="w-3 h-3 text-blue-600" />
-                            <span>Vers BL</span>
-                          </button>
+                        d.statut === 'FACTURÉ' ? (
+                          <span className="px-2 py-0.5 text-[10px] font-bold text-purple-700 bg-purple-50 border border-purple-200 rounded">
+                            Facturé
+                          </span>
+                        ) : d.statut === 'TRANSFÉRÉ' ? (
+                          <div className="flex items-center gap-1">
+                            <span className="px-1.5 py-0.5 text-[10px] font-bold text-blue-700 bg-blue-50 border border-blue-200 rounded">
+                              En BL
+                            </span>
+                            <button
+                              onClick={() => handleConvertToFacture(d)}
+                              className="px-2 py-0.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded flex items-center gap-1 transition-colors"
+                              title="Transférer aussi ce Devis en Facture"
+                            >
+                              <FileText className="w-3 h-3 text-emerald-600" />
+                              <span>Facturer</span>
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => handleConvertToBL(d)}
+                              className="px-2 py-0.5 text-[10px] font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded flex items-center gap-1 transition-colors"
+                              title="Transférer ce Devis en Bon de Livraison (BL)"
+                            >
+                              <Truck className="w-3 h-3 text-blue-600" />
+                              <span>Vers BL</span>
+                            </button>
+                            <button
+                              onClick={() => handleConvertToFacture(d)}
+                              className="px-2 py-0.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded flex items-center gap-1 transition-colors"
+                              title="Transférer ce Devis en Facture"
+                            >
+                              <FileText className="w-3 h-3 text-emerald-600" />
+                              <span>Facturer</span>
+                            </button>
+                          </div>
+                        )
+                      )}
+
+                      {d.docType === 'BON_LIVRAISON' && (
+                        d.statut === 'FACTURÉ' ? (
+                          <span className="px-2 py-0.5 text-[10px] font-bold text-purple-700 bg-purple-50 border border-purple-200 rounded">
+                            Facturé
+                          </span>
+                        ) : (
                           <button
                             onClick={() => handleConvertToFacture(d)}
                             className="px-2 py-0.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded flex items-center gap-1 transition-colors"
-                            title="Transférer ce Devis en Facture"
+                            title="Transférer ce Bon de Livraison en Facture"
                           >
                             <FileText className="w-3 h-3 text-emerald-600" />
                             <span>Facturer</span>
                           </button>
-                        </div>
-                      )}
-
-                      {d.docType === 'BON_LIVRAISON' && (
-                        <button
-                          onClick={() => handleConvertToFacture(d)}
-                          className="px-2 py-0.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded flex items-center gap-1 transition-colors"
-                          title="Transférer ce Bon de Livraison en Facture"
-                        >
-                          <FileText className="w-3 h-3 text-emerald-600" />
-                          <span>Facturer</span>
-                        </button>
+                        )
                       )}
 
                       <button
@@ -748,35 +885,61 @@ export const FacturationView: React.FC = () => {
 
                 {/* Direct Conversion Actions inside Modal */}
                 {viewingDoc.docType === 'DEVIS' && (
-                  <>
-                    <button
-                      onClick={() => handleConvertToBL(viewingDoc)}
-                      className="px-3.5 py-2 text-xs font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg flex items-center gap-1.5 transition-colors shadow-2xs"
-                      title="Transférer ce Devis en Bon de Livraison (BL)"
-                    >
-                      <Truck className="w-3.5 h-3.5 text-blue-600" />
-                      <span>Transférer en BL</span>
-                    </button>
+                  viewingDoc.statut === 'FACTURÉ' ? (
+                    <span className="px-3 py-1.5 text-xs font-bold text-purple-700 bg-purple-50 border border-purple-200 rounded-lg">
+                      ✓ Devis déjà facturé
+                    </span>
+                  ) : viewingDoc.statut === 'TRANSFÉRÉ' ? (
+                    <div className="flex items-center gap-2">
+                      <span className="px-3 py-1.5 text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 rounded-lg">
+                        ✓ Devis transféré en BL
+                      </span>
+                      <button
+                        onClick={() => handleConvertToFacture(viewingDoc)}
+                        className="px-3.5 py-2 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg flex items-center gap-1.5 transition-colors shadow-2xs"
+                        title="Transférer aussi ce Devis en Facture"
+                      >
+                        <FileText className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Transférer en Facture</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => handleConvertToBL(viewingDoc)}
+                        className="px-3.5 py-2 text-xs font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg flex items-center gap-1.5 transition-colors shadow-2xs"
+                        title="Transférer ce Devis en Bon de Livraison (BL)"
+                      >
+                        <Truck className="w-3.5 h-3.5 text-blue-600" />
+                        <span>Transférer en BL</span>
+                      </button>
+                      <button
+                        onClick={() => handleConvertToFacture(viewingDoc)}
+                        className="px-3.5 py-2 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg flex items-center gap-1.5 transition-colors shadow-2xs"
+                        title="Transférer ce Devis en Facture"
+                      >
+                        <FileText className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Transférer en Facture</span>
+                      </button>
+                    </>
+                  )
+                )}
+
+                {viewingDoc.docType === 'BON_LIVRAISON' && (
+                  viewingDoc.statut === 'FACTURÉ' ? (
+                    <span className="px-3 py-1.5 text-xs font-bold text-purple-700 bg-purple-50 border border-purple-200 rounded-lg">
+                      ✓ Bon de livraison déjà facturé
+                    </span>
+                  ) : (
                     <button
                       onClick={() => handleConvertToFacture(viewingDoc)}
                       className="px-3.5 py-2 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg flex items-center gap-1.5 transition-colors shadow-2xs"
-                      title="Transférer ce Devis en Facture"
+                      title="Transférer ce Bon de Livraison en Facture"
                     >
                       <FileText className="w-3.5 h-3.5 text-emerald-600" />
                       <span>Transférer en Facture</span>
                     </button>
-                  </>
-                )}
-
-                {viewingDoc.docType === 'BON_LIVRAISON' && (
-                  <button
-                    onClick={() => handleConvertToFacture(viewingDoc)}
-                    className="px-3.5 py-2 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg flex items-center gap-1.5 transition-colors shadow-2xs"
-                    title="Transférer ce Bon de Livraison en Facture"
-                  >
-                    <FileText className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Transférer en Facture</span>
-                  </button>
+                  )
                 )}
               </div>
 

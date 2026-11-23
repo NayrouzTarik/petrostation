@@ -357,7 +357,7 @@ export interface CommercialDoc {
   totalHT: number;
   totalTVA: number;
   totalTTC: number;
-  statut: 'PAYÉE' | 'EN_ATTENTE' | 'LIVRÉ' | 'EN_COURS' | 'ACCEPTÉ' | 'ANNULÉ' | 'À PAYER';
+  statut: 'PAYÉE' | 'EN_ATTENTE' | 'LIVRÉ' | 'EN_COURS' | 'ACCEPTÉ' | 'ANNULÉ' | 'À PAYER' | 'FACTURÉ' | 'TRANSFÉRÉ';
   modePaiement?: string;
   numeroCheque?: string;
   notes?: string;
